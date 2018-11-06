@@ -139,7 +139,7 @@ class FireSimBoomConfig extends Config(
   new WithBlockDevice ++
   new BoomWithLargeTLBs ++
   // Using a small config because it has 64-bit system bus, and compiles quickly
-  new boom.system.SmallBoomConfig)
+  new boom.system.BoomConfig)
 
 class FireSimBoomTracedConfig extends Config(
   new WithTraceBoom ++ new FireSimBoomConfig)
