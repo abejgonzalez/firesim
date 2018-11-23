@@ -1,7 +1,14 @@
+#ifndef BASEPORT_H
+#define BASEPORT_H
+
+#include "flit.h"
+
+// AJG: I think that this might be the MAX BW
+//#define AMT_OF_FLITS_IN_SWITCH 200 // 
 
 struct switchpacket {
     uint64_t timestamp;
-    uint64_t dat[200];
+    uint8_t* dat; // This should be as large as the ethernet MTU (with some padding)
     int amtwritten;
     int amtread;
     int sender;
@@ -94,7 +101,7 @@ void BasePort::write_flits_to_output() {
             for (;(i < thispacket->amtwritten) && (flitswritten < LINKLATENCY); i++) {
                 write_last_flit(current_output_buf, flitswritten, i == (thispacket->amtwritten-1));
                 write_valid_flit(current_output_buf, flitswritten);
-                write_flit(current_output_buf, flitswritten, thispacket->dat[i]);
+                write_flit(current_output_buf, flitswritten, (thispacket->dat + (i*FLIT_SIZE_BYTES)));
                 empty_buf = false;
 
                 if (!_throttle)
@@ -131,3 +138,5 @@ void BasePort::setup_send_buf() {
         *((uint64_t*)(current_output_buf) + bigtokenno*8) = 0L;
     }
 }
+
+#endif

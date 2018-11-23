@@ -1,3 +1,6 @@
+#ifndef SHMEMPORT_H
+#define SHMEMPORT_H
+
 #include <errno.h>
 
 class ShmemPort : public BasePort {
@@ -157,3 +160,5 @@ void ShmemPort::tick() {
     // swap buf pointers
     current_input_buf = recvbufs[currentround];
 }
+
+#endif

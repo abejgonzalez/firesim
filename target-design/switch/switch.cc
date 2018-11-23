@@ -47,6 +47,7 @@ int throttle_denom = 1;
 // size of output buffers, in # of flits
 // only if LIMITED BUFSIZE is set
 // TODO: expose in manager
+// AJG: TODO: According to Sagar this doesn't have to change
 #define OUTPUT_BUF_SIZE (131072L)
 
 // pull in # clients config
@@ -55,16 +56,22 @@ int throttle_denom = 1;
 #undef NUMCLIENTSCONFIG
 
 // DO NOT TOUCH
+#define MAX_BW (800)
+#define FLIT_SIZE_BITS (256)
+#define BIGTOKEN_SIZE_BITS (512)
 #define NUM_TOKENS (LINKLATENCY)
-#define TOKENS_PER_BIGTOKEN (1) // since 256 is the largest flit that can fit in the 512 pcie
-#define BIGTOKEN_BYTES (64)
+
+#define FLIT_SIZE_BYTES (FLIT_SIZE_BITS / 8)
+#define BIGTOKEN_SIZE_BYTES (BIGTOKEN_SIZE_BITS / 8)
+
+#define TOKENS_PER_BIGTOKEN ((uint16_t)((BIGTOKEN_SIZE_BYTES*8)/(FLIT_SIZE_BITS+3)))
 #define NUM_BIGTOKENS (NUM_TOKENS/TOKENS_PER_BIGTOKEN)
-#define BUFSIZE_BYTES (NUM_BIGTOKENS*BIGTOKEN_BYTES)
+#define BUFSIZE_BYTES (NUM_BIGTOKENS*BIGTOKEN_SIZE_BYTES)
 
 // DO NOT TOUCH
 #define SWITCHLAT_NUM_TOKENS (SWITCHLATENCY)
 #define SWITCHLAT_NUM_BIGTOKENS (SWITCHLAT_NUM_TOKENS/TOKENS_PER_BIGTOKEN)
-#define SWITCHLAT_BUFSIZE_BYTES (SWITCHLAT_NUM_BIGTOKENS*BIGTOKEN_BYTES)
+#define SWITCHLAT_BUFSIZE_BYTES (SWITCHLAT_NUM_BIGTOKENS*BIGTOKEN_SIZE_BYTES)
 
 uint64_t this_iter_cycles_start = 0;
 
@@ -101,11 +108,12 @@ for (int port = 0; port < NUMPORTS; port++) {
 
     for (int tokenno = 0; tokenno < NUM_TOKENS; tokenno++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
-            uint64_t flit = get_flit(input_port_buf, tokenno);
+            uint8_t* flit = get_flit(input_port_buf, tokenno);
 
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
                 sp = (switchpacket*)calloc(sizeof(switchpacket), 1);
+                sp->dat = (uint8_t*)calloc(FLIT_SIZE_BYTES, ETH_MAX_WORDS + ETH_EXTRA_FLITS);
                 current_port->input_in_progress = sp;
 
                 // here is where we inject switching latency. this is min port-to-port latency
@@ -114,7 +122,7 @@ for (int port = 0; port < NUMPORTS; port++) {
             }
             sp = current_port->input_in_progress;
 
-            sp->dat[sp->amtwritten++] = flit;
+            memcpy( sp->dat + (sp->amtwritten++ * FLIT_SIZE_BYTES), flit, FLIT_SIZE_BYTES);
             if (is_last_flit(input_port_buf, tokenno)) {
                 current_port->inputqueue.push(sp);
                 current_port->input_in_progress = NULL;
@@ -162,7 +170,7 @@ for (int i = 0; i < NUMPORTS; i++) {
 while (!pqueue.empty()) {
     switchpacket * tsp = pqueue.top().switchpack;
     pqueue.pop();
-    uint16_t send_to_port = get_port_from_flit(tsp->dat[0], 0 /* junk remove arg */);
+    uint16_t send_to_port = get_port_from_flit(tsp->dat, 0 /* junk remove arg */);
     printf("packet for port: %x\n", send_to_port);
     printf("packet timestamp: %ld\n", tsp->timestamp);
     if (send_to_port == BROADCAST_ADJUSTED) {
@@ -174,6 +182,8 @@ while (!pqueue.empty()) {
             if (i != tsp->sender ) {
                 switchpacket * tsp2 = (switchpacket*)malloc(sizeof(switchpacket));
                 memcpy(tsp2, tsp, sizeof(switchpacket));
+                tsp2->dat = (uint8_t*)malloc(FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
+                memcpy(tsp2->dat, tsp->dat, FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
                 ports[i]->outputqueue.push(tsp2);
             }
         }
@@ -225,7 +235,7 @@ int main (int argc, char *argv[]) {
     switchlat = atoi(argv[2]);
     bandwidth = atoi(argv[3]);
 
-    simplify_frac(bandwidth, 200, &throttle_numer, &throttle_denom);
+    simplify_frac(bandwidth, MAX_BW, &throttle_numer, &throttle_denom);
 
     fprintf(stdout, "Using link latency: %d\n", LINKLATENCY);
     fprintf(stdout, "Using switching latency: %d\n", SWITCHLATENCY);

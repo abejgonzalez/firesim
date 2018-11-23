@@ -1,3 +1,5 @@
+#ifndef SSHPORT_H
+#define SSHPORT_H
 
 #include <queue>
 
@@ -6,32 +8,31 @@
 #include <linux/if_tun.h>
 
 #define NET_IP_ALIGN 2
-#define ETH_MAX_WORDS 190
 #define ETH_MAX_BYTES 1518
-
-struct network_flit {
-    uint64_t data;
-    bool last;
-};
+#define ETH_MAX_WORDS ((ETH_MAX_BYTES + (FLIT_SIZE_BYTES - 1)) / FLIT_SIZE_BYTES) //190 // Round up based on flit size
+#define ETH_EXTRA_FLITS 10 // Arbitrary amount of padding (in flits)
 
 /* The other side of this port is a TAP interface to the host network. 
  * This allows users to ssh into a simulated cluster */
 class SSHPort : public BasePort {
     public:
         SSHPort(int portNo);
+        ~SSHPort();
         void tick();
         void tick_pre();
         void send();
         void recv();
     private:
         int sshtapfd;
-        uint64_t tap_send_buffer[ETH_MAX_WORDS], tap_recv_buffer[ETH_MAX_WORDS];
+        //uint64_t tap_send_buffer[ETH_MAX_WORDS], tap_recv_buffer[ETH_MAX_WORDS];
+        uint8_t* tap_send_buffer;
+        uint8_t* tap_recv_buffer;
         void *tap_send_frame = ((char *) tap_send_buffer) + NET_IP_ALIGN;
         void *tap_recv_frame = ((char *) tap_recv_buffer) + NET_IP_ALIGN;
         int tap_send_idx = 0, tap_len;
         bool tap_can_send = false;
-        std::queue<network_flit> out_flits;
-        std::queue<network_flit> in_flits;
+        std::queue<NetworkFlit> out_flits;
+        std::queue<NetworkFlit> in_flits;
 };
 
 /* open TAP device */
@@ -78,8 +79,15 @@ SSHPort::SSHPort(int portNo) : BasePort(portNo, false) {
         abort();
     }
 
+    tap_send_buffer = (uint8_t*) malloc( FLIT_SIZE_BYTES*ETH_MAX_WORDS*sizeof(uint8_t) );
+    tap_recv_buffer = (uint8_t*) malloc( FLIT_SIZE_BYTES*ETH_MAX_WORDS*sizeof(uint8_t) );
     current_input_buf = (uint8_t*) calloc(sizeof(uint8_t), BUFSIZE_BYTES);
     current_output_buf = (uint8_t*) calloc(sizeof(uint8_t), BUFSIZE_BYTES);
+}
+
+SSHPort::~SSHPort() {
+    free(tap_send_buffer);
+    free(tap_recv_buffer);
 }
 
 void SSHPort::send() {
@@ -96,8 +104,9 @@ void SSHPort::send() {
     // first, push into out_flits queue
     for (int tokenno = 0; tokenno < NUM_TOKENS; tokenno++) {
         if (is_valid_flit(current_output_buf, tokenno)) {
-            struct network_flit flt;
-            flt.data = get_flit(current_output_buf, tokenno);
+            // put data into out_flit queue
+            NetworkFlit flt;
+            memcpy( flt.data_buffer, get_flit(current_output_buf, tokenno), FLIT_SIZE_BYTES );
             flt.last = is_last_flit(current_output_buf, tokenno);
             out_flits.push(flt);
         }
@@ -107,7 +116,7 @@ void SSHPort::send() {
     // next, see if there is data to send
     if (!tap_can_send) {
         while (!out_flits.empty()) {
-            tap_send_buffer[tap_send_idx] = out_flits.front().data;
+            memcpy( tap_send_buffer + (tap_send_idx*FLIT_SIZE_BYTES), out_flits.front().data_buffer, FLIT_SIZE_BYTES );
             tap_can_send = out_flits.front().last;
             out_flits.pop();
             tap_send_idx++;
@@ -117,7 +126,7 @@ void SSHPort::send() {
     }
 
     if (tap_can_send) {
-        tap_len = tap_send_idx * sizeof(uint64_t) - NET_IP_ALIGN;
+        tap_len = (tap_send_idx * FLIT_SIZE_BYTES) - NET_IP_ALIGN;
         if (::write(sshtapfd, tap_send_frame, tap_len) >= 0) {
             tap_send_idx = 0;
             tap_can_send = false;
@@ -138,10 +147,10 @@ void SSHPort::recv() {
     // pull in flits from the TAP
     tap_len = ::read(sshtapfd, tap_recv_frame, ETH_MAX_BYTES);
     if (tap_len >= 0) {
-        int i, n = ceil_div(tap_len + NET_IP_ALIGN, sizeof(uint64_t));
+        int i, n = ceil_div(tap_len + NET_IP_ALIGN, FLIT_SIZE_BYTES);
         for (i = 0; i < n; i++) {
-            struct network_flit flt;
-            flt.data = tap_recv_buffer[i];
+            NetworkFlit flt;
+            memcpy( flt.data_buffer, tap_recv_buffer + (i * FLIT_SIZE_BYTES), FLIT_SIZE_BYTES );
             flt.last = i == (n - 1);
             in_flits.push(flt);
         }
@@ -157,7 +166,7 @@ void SSHPort::recv() {
         if (!in_flits.empty()) {
             write_last_flit(current_input_buf, tokenno, in_flits.front().last);
             write_valid_flit(current_input_buf, tokenno);
-            write_flit(current_input_buf, tokenno, in_flits.front().data);
+            write_flit(current_input_buf, tokenno, in_flits.front().data_buffer);
             in_flits.pop();
         }
     }
@@ -170,3 +179,5 @@ void SSHPort::tick() {
 void SSHPort::tick_pre() {
     // don't need to do anything for SSHPorts
 }
+
+#endif
