@@ -176,6 +176,7 @@ class FireSimConfig extends Config(
   new WithBlockDevWidget ++
   new WithDefaultMemModel ++
   new WithTracerVWidget ++
+  new WithSynthAsserts ++
   new BasePlatformConfig)
 
 class FireSimClockDivConfig extends Config(
@@ -184,6 +185,7 @@ class FireSimClockDivConfig extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new WithDefaultMemModel(clockDivision = 2) ++
+  new WithSynthAsserts ++
   new BasePlatformConfig)
 
 class FireSimDDR3Config extends Config(
@@ -192,6 +194,7 @@ class FireSimDDR3Config extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new FCFS16GBQuadRank ++
+  new WithSynthAsserts ++
   new BasePlatformConfig)
 
 class FireSimDDR3LLC4MBConfig extends Config(
@@ -200,6 +203,7 @@ class FireSimDDR3LLC4MBConfig extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new FCFS16GBQuadRankLLC4MB ++
+  new WithSynthAsserts ++
   new BasePlatformConfig)
 
 class FireSimDDR3FRFCFSConfig extends Config(
@@ -208,6 +212,7 @@ class FireSimDDR3FRFCFSConfig extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new FRFCFS16GBQuadRank ++
+  new WithSynthAsserts ++
   new BasePlatformConfig)
 
 class FireSimDDR3FRFCFSLLC4MBConfig extends Config(
@@ -216,6 +221,7 @@ class FireSimDDR3FRFCFSLLC4MBConfig extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new FRFCFS16GBQuadRankLLC4MB ++
+  new WithSynthAsserts ++
   new BasePlatformConfig)
 
 class FireSimDDR3FRFCFSLLC4MB3ClockDivConfig extends Config(
@@ -224,4 +230,5 @@ class FireSimDDR3FRFCFSLLC4MB3ClockDivConfig extends Config(
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new FRFCFS16GBQuadRankLLC4MB3Div ++
+  new WithSynthAsserts ++
   new BasePlatformConfig)
