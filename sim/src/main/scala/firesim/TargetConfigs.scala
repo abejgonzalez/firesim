@@ -147,17 +147,17 @@ class FireSimBoomConfig extends Config(
   new WithBoomSynthAssertExcludes ++ // Will do nothing unless assertion synth is enabled
   new boom.system.BoomConfig)
 
-//class FireSimSecureBoomConfig extends Config(
-//  new WithBootROM ++
-//  new WithPeripheryBusFrequency(BigInt(3200000000L)) ++
-//  new WithExtMemSize(0x400000000L) ++ // 16GB
-//  new WithoutTLMonitors ++
-//  new WithUARTKey ++
-//  new WithNICKey ++
-//  new WithBlockDevice ++
-//  new WithBoomL2TLBs(1024) ++
-//  new WithBoomSynthAssertExcludes ++ // Will do nothing unless assertion synth is enabled
-//  new boom.system.SecureBoomConfig)
+class FireSimSecureBoomConfig extends Config(
+  new WithBootROM ++
+  new WithPeripheryBusFrequency(BigInt(3200000000L)) ++
+  new WithExtMemSize(0x400000000L) ++ // 16GB
+  new WithoutTLMonitors ++
+  new WithUARTKey ++
+  new WithNICKey ++
+  new WithBlockDevice ++
+  new WithBoomL2TLBs(1024) ++
+  new WithBoomSynthAssertExcludes ++ // Will do nothing unless assertion synth is enabled
+  new boom.system.SecureBoomConfig)
 
 // A safer implementation than the one in BOOM in that it
 // duplicates whatever BOOMTileKey.head is present N times. This prevents
