@@ -20,11 +20,11 @@ class NetworkFlit {
 
 NetworkFlit::NetworkFlit()
     : last(false) {
-    data_buffer = (uint8_t*) malloc(FLIT_SIZE_BYTES);
+    this->data_buffer = (uint8_t*) malloc(FLIT_SIZE_BYTES);
 }
 
 NetworkFlit::~NetworkFlit() {
-    free(data_buffer);
+    free(this->data_buffer);
 }
 
 /**
@@ -166,8 +166,8 @@ uint16_t get_port_from_flit(uint8_t* flit_buf, int current_port) {
             *((uint64_t*)(flit_buf + (1 * FLIT_SIZE_BYTES))),
             *((uint64_t*)(flit_buf + (0 * FLIT_SIZE_BYTES))));
 
-    uint16_t is_multicast = (*((uint64_t*)flit_buf) >> 16) & 0x1;
     // AJG: TODO: Check where in the flit the dest mac is
+    uint16_t is_multicast = (*((uint64_t*)flit_buf) >> 16) & 0x1;
     uint16_t flit_low = (*((uint64_t*)flit_buf) >> 48) & 0xFFFF; // indicates dest
     uint16_t sendport = (__builtin_bswap16(flit_low));
 

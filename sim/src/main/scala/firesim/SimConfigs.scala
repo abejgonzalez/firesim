@@ -242,14 +242,15 @@ class FireSimDDR3FRFCFSLLC4MBConfig extends Config(
   new FRFCFS16GBQuadRankLLC4MB ++
   new midas.F1Config)
 
-// AJG: for increased flit size
+// AJG: For increased flit size testing
 class FireSimFlit256DDR3FRFCFSLLC4MBConfig extends Config(
+  new WithDesiredHostFrequency(90) ++
   new WithSerialWidget ++
   new WithUARTWidget ++
   new WithSimpleNICWidget(ifWidth = 256) ++
   new WithBlockDevWidget ++
   new FRFCFS16GBQuadRankLLC4MB ++
-  new BasePlatformConfig)
+  new midas.F1Config)
 
 class FireSimDDR3FRFCFSLLC4MBConfig160MHz extends Config(
   new WithDesiredHostFrequency(160) ++

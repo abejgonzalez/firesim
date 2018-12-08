@@ -13,9 +13,7 @@ struct switchpacket {
     int amtread;
     int sender;
 };
-
 typedef struct switchpacket switchpacket;
-
 
 class BasePort {
     public:
