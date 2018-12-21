@@ -14,13 +14,13 @@
 
 // DO NOT MODIFY PARAMS BELOW THIS LINE
 
-#define MAX_BANDWIDTH       (800) // This is FLIT_SIZE*PROC_SPEED rounded to the nearest 100
-#define MAX_BANDWIDTH_BITS   (10) // This is the amount of bits to hold the MAX_BANDWIDTH value
+#define MAX_BANDWIDTH       (200) // This is FLIT_SIZE*PROC_SPEED rounded to the nearest 100
+#define MAX_BANDWIDTH_BITS   (8) // This is the amount of bits to hold the MAX_BANDWIDTH value
 #define PCIE_WIDTH_BITS     (512) // Size of the PCIE interface
 #define PROC_SPEED_GHZ      (3.2) // Assumed processor speed
 #define VAL_BITS              (3) // Extra bits associated with a flit
 #define EXTRA_BYTES           (1)
-#define FLIT_WIDTH_BITS     (256) // Size of the network interface
+#define FLIT_WIDTH_BITS      (64) // Size of the network interface
 #define BUF_WIDTH_BITS       (64) // Size of the AXI4 interface
 #define TOKENS_PER_BIGTOKEN (PCIE_WIDTH_BITS / (FLIT_WIDTH_BITS + VAL_BITS)) // Amount of smaller tokens per BigToken
 #define SIMLATENCY_BT       ((this->LINKLATENCY) / TOKENS_PER_BIGTOKEN)
