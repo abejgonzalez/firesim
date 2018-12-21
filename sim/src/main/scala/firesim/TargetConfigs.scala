@@ -84,7 +84,7 @@ class FireSimRocketChipConfig extends Config(
   new WithExtMemSize(0x400000000L) ++ // 16GB
   new WithoutTLMonitors ++
   new WithUARTKey ++
-  new WithNICKey(256) ++
+  new WithNICKey(64) ++
   new WithBlockDevice ++
   new WithRocketL2TLBs(1024) ++
   new WithPerfCounters ++

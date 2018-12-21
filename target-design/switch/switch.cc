@@ -11,7 +11,7 @@
 #include <omp.h>
 #include <cstdlib>
 
-#define IGNORE_PRINTF
+//#define IGNORE_PRINTF
 
 #ifdef IGNORE_PRINTF
 #define printf(fmt, ...) (0)
@@ -56,8 +56,10 @@ int throttle_denom = 1;
 #undef NUMCLIENTSCONFIG
 
 // DO NOT TOUCH
-#define MAX_BW (800)
-#define FLIT_SIZE_BITS (256)
+//#define MAX_BW (800)
+//#define FLIT_SIZE_BITS (256)
+#define MAX_BW (200)
+#define FLIT_SIZE_BITS (64)
 #define BIGTOKEN_SIZE_BITS (512)
 #define NUM_TOKENS (LINKLATENCY)
 

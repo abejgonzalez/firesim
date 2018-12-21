@@ -198,7 +198,7 @@ void simplenic_t::init() {
 
     // note: output_token_available check is to cover case where if there is 1 small token for bigtoken
     // then the initial token (given to the token queues on startup) propagates to the outgoing_count
-    if ((input_token_capacity != SIMLATENCY_BT) || (output_tokens_available != (TOKENS_PER_BIGTOKEN == 1))) {
+    if ((input_token_capacity != SIMLATENCY_BT) && (output_tokens_available != (TOKENS_PER_BIGTOKEN == 1))) {
         printf("FAIL. INCORRECT TOKENS ON BOOT. produced tokens available %d, input slots available %d\n", output_tokens_available, input_token_capacity);
         exit(1);
     }
