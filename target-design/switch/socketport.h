@@ -1,6 +1,3 @@
-#ifndef SOCKETPORT_H
-#define SOCKETPORT_H
-
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -181,5 +178,3 @@ void SocketServerPort::tick() {
 void SocketServerPort::tick_pre() {
     // does nothing in this port
 }
-
-#endif

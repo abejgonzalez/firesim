@@ -1,6 +1,3 @@
-#ifndef SSHPORT_H
-#define SSHPORT_H
-
 #include <queue>
 
 #include <sys/ioctl.h>
@@ -24,15 +21,14 @@ class SSHPort : public BasePort {
         void recv();
     private:
         int sshtapfd;
-        //uint64_t tap_send_buffer[ETH_MAX_WORDS], tap_recv_buffer[ETH_MAX_WORDS];
         uint8_t* tap_send_buffer;
         uint8_t* tap_recv_buffer;
         void *tap_send_frame = ((char *) tap_send_buffer) + NET_IP_ALIGN;
         void *tap_recv_frame = ((char *) tap_recv_buffer) + NET_IP_ALIGN;
         int tap_send_idx = 0, tap_len;
         bool tap_can_send = false;
-        std::queue<NetworkFlit> out_flits;
-        std::queue<NetworkFlit> in_flits;
+        std::queue<NetworkFlit*> out_flits;
+        std::queue<NetworkFlit*> in_flits;
 };
 
 /* open TAP device */
@@ -108,8 +104,8 @@ void SSHPort::send() {
     for (int tokenno = 0; tokenno < NUM_TOKENS; tokenno++) {
         if (is_valid_flit(current_output_buf, tokenno)) {
             // put data into out_flit queue
-            NetworkFlit flt;
-            memcpy( flt.data_buffer, get_flit(current_output_buf, tokenno), FLIT_SIZE_BYTES );
+            NetworkFlit* flt = new NetworkFlit;
+            memcpy( flt->data_buffer, get_flit(current_output_buf, tokenno), FLIT_SIZE_BYTES );
             flt.last = is_last_flit(current_output_buf, tokenno);
             out_flits.push(flt);
         }
@@ -119,8 +115,9 @@ void SSHPort::send() {
     // next, see if there is data to send
     if (!tap_can_send) {
         while (!out_flits.empty()) {
-            memcpy( tap_send_buffer + (tap_send_idx*FLIT_SIZE_BYTES), out_flits.front().data_buffer, FLIT_SIZE_BYTES );
-            tap_can_send = out_flits.front().last;
+            memcpy( tap_send_buffer + (tap_send_idx*FLIT_SIZE_BYTES), out_flits.front()->data_buffer, FLIT_SIZE_BYTES );
+            tap_can_send = out_flits.front()->last;
+            free(out_flits.front());
             out_flits.pop();
             tap_send_idx++;
             if (tap_can_send)
@@ -153,9 +150,9 @@ void SSHPort::recv() {
     if (tap_len >= 0) {
         int i, n = ceil_div(tap_len + NET_IP_ALIGN, FLIT_SIZE_BYTES);
         for (i = 0; i < n; i++) {
-            NetworkFlit flt;
-            memcpy( flt.data_buffer, tap_recv_buffer + (i * FLIT_SIZE_BYTES), FLIT_SIZE_BYTES );
-            flt.last = i == (n - 1);
+            NetworkFlit* flt = new NetworkFlit;
+            memcpy( flt->data_buffer, tap_recv_buffer + (i * FLIT_SIZE_BYTES), FLIT_SIZE_BYTES );
+            flt->last = i == (n - 1);
             in_flits.push(flt);
         }
     } else if (errno != EAGAIN) {
@@ -168,10 +165,12 @@ void SSHPort::recv() {
 
     for (int tokenno = 0; tokenno < NUM_TOKENS; tokenno++) {
         if (!in_flits.empty()) {
-            write_last_flit(current_input_buf, tokenno, in_flits.front().last);
+            write_last_flit(current_input_buf, tokenno, in_flits.front()->last);
             write_valid_flit(current_input_buf, tokenno);
-            write_flit(current_input_buf, tokenno, in_flits.front().data_buffer);
+            write_flit(current_input_buf, tokenno, in_flits.front()->data_buffer);
+            free(in_flits.front());
             in_flits.pop();
+
         }
     }
 }
@@ -183,5 +182,3 @@ void SSHPort::tick() {
 void SSHPort::tick_pre() {
     // don't need to do anything for SSHPorts
 }
-
-#endif

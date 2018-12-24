@@ -188,6 +188,7 @@ while (!pqueue.empty()) {
                 ports[i]->outputqueue.push(tsp2);
             }
         }
+        free(tsp->dat);
         free(tsp);
     } else {
         ports[send_to_port]->outputqueue.push(tsp);

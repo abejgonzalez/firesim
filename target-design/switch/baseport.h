@@ -1,10 +1,4 @@
-#ifndef BASEPORT_H
-#define BASEPORT_H
-
 #include "flit.h"
-
-// AJG: I think that this might be the MAX BW
-//#define AMT_OF_FLITS_IN_SWITCH 200 // 
 
 struct switchpacket {
     uint64_t timestamp;
@@ -84,6 +78,7 @@ void BasePort::write_flits_to_output() {
                 // so, drop it.
                 printf("overflow, drop pack: intended timestamp: %ld, current timestamp: %ld, out bufsize in # flits: %ld, diff: %ld\n", outputtimestamp, basetime + flitswritten, OUTPUT_BUF_SIZE, (int64_t)(basetime + flitswritten) - (int64_t)(outputtimestamp));
                 outputqueue.pop();
+                free(thispacket->dat);
                 free(thispacket);
                 continue;
             }
@@ -112,6 +107,7 @@ void BasePort::write_flits_to_output() {
             if (i == thispacket->amtwritten) {
                 // we finished sending this packet, so get rid of it
                 outputqueue.pop();
+                free(thispacket->dat);
                 free(thispacket);
             } else {
                 // we're not done sending this packet, so mark how much has been sent
@@ -126,6 +122,7 @@ void BasePort::write_flits_to_output() {
         }
     }
     if (empty_buf) {
+        // AJG: TODO: Check that this is right?
         ((uint64_t*)current_output_buf)[0] = 0xDEADBEEFDEADBEEFL;
     }
 }
@@ -133,8 +130,7 @@ void BasePort::write_flits_to_output() {
 // initialize output port fullness for this round
 void BasePort::setup_send_buf() {
     for (int bigtokenno = 0; bigtokenno < NUM_BIGTOKENS; bigtokenno++) {
+        // AJG: TODO: Check that this is right?
         *((uint64_t*)(current_output_buf) + bigtokenno*8) = 0L;
     }
 }
-
-#endif
