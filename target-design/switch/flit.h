@@ -118,14 +118,14 @@ bool is_valid_flit(uint8_t * recv_buf, int tokenid) {
     //int bitoffset = 43 + (offset * 3);
     int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
-    printf("ivf: isvflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
-            (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
-            *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
-            offset,
-            bitoffset);
+    //printf("ivf: isvflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
+    //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
+    //        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
+    //        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
+    //        *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
+    //        *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
+    //        offset,
+    //        bitoffset);
 
     return (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1;
 }
@@ -146,14 +146,14 @@ bool is_last_flit(uint8_t * recv_buf, int tokenid) {
     //int bitoffset = 45 + (offset * 3);
     int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
-    printf("ilf: islflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
-            (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
-            *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
-            offset,
-            bitoffset);
+    //printf("ilf: islflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
+    //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
+    //        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
+    //        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
+    //        *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
+    //        *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
+    //        offset,
+    //        bitoffset);
 
     return (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1;
 }
