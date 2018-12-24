@@ -106,7 +106,7 @@ void SSHPort::send() {
             // put data into out_flit queue
             NetworkFlit* flt = new NetworkFlit;
             memcpy( flt->data_buffer, get_flit(current_output_buf, tokenno), FLIT_SIZE_BYTES );
-            flt.last = is_last_flit(current_output_buf, tokenno);
+            flt->last = is_last_flit(current_output_buf, tokenno);
             out_flits.push(flt);
         }
     }
