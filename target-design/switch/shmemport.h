@@ -131,29 +131,38 @@ ShmemPort::ShmemPort(int portNo, char * shmemportname, bool uplink) : BasePort(p
 }
 
 void ShmemPort::send() {
+    //printf("shmemport: send\n");
     if (((uint64_t*)current_output_buf)[0] == 0xDEADBEEFDEADBEEFL) {
         // if compress flag is set, clear it, this port type doesn't care
         // (and in fact, we're writing too much, so stuff later will get confused)
+        //printf("shmemport: clear\n");
         ((uint64_t*)current_output_buf)[0] = 0L;
     }
     // mark flag to initiate "send"
+    //printf("shmemport: set\n");
     current_output_buf[BUFSIZE_BYTES] = 1;
 }
 
 void ShmemPort::recv() {
+    //printf("shmemport: recv\n");
     volatile uint8_t * polladdr = current_input_buf + BUFSIZE_BYTES;
     while (*polladdr == 0) { ; } // poll
+    //printf("shmemport: recv done\n");
 }
 
 void ShmemPort::tick_pre() {
+    //printf("shmemport: tick_pre\n");
     currentround = (currentround + 1) % 2;
     current_output_buf = sendbufs[currentround];
 }
 
 void ShmemPort::tick() {
+    //printf("shmemport: tick\n");
     // zero out recv buf flag for next iter
     current_input_buf[BUFSIZE_BYTES] = 0;
 
     // swap buf pointers
     current_input_buf = recvbufs[currentround];
+    //printf("shmemport: tick done\n");
+    // zero out recv buf flag for next iter
 }

@@ -110,9 +110,16 @@ for (int port = 0; port < NUMPORTS; port++) {
     for (int tokenno = 0; tokenno < NUM_TOKENS; tokenno++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
             uint8_t* flit = get_flit(input_port_buf, tokenno);
+            
+            printf("switch: postprocess flit: item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x)\n",
+                *((uint64_t*)(flit + (3 * FLIT_SIZE_BYTES))),
+                *((uint64_t*)(flit + (2 * FLIT_SIZE_BYTES))),
+                *((uint64_t*)(flit + (1 * FLIT_SIZE_BYTES))),
+                *((uint64_t*)(flit + (0 * FLIT_SIZE_BYTES))));
 
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
+                printf("switch: current_port->input_in_progress is setup as current flit\n");
                 sp = (switchpacket*)calloc(sizeof(switchpacket), 1);
                 sp->dat = (uint8_t*)calloc(FLIT_SIZE_BYTES, ETH_MAX_WORDS + ETH_EXTRA_FLITS);
                 current_port->input_in_progress = sp;
@@ -123,8 +130,9 @@ for (int port = 0; port < NUMPORTS; port++) {
             }
             sp = current_port->input_in_progress;
 
-            memcpy( sp->dat + (sp->amtwritten++ * FLIT_SIZE_BYTES), flit, FLIT_SIZE_BYTES);
+            memcpy( sp->dat + ((sp->amtwritten++) * FLIT_SIZE_BYTES), flit, FLIT_SIZE_BYTES);
             if (is_last_flit(input_port_buf, tokenno)) {
+                printf("switch: last flit, push to inputqueue\n");
                 current_port->inputqueue.push(sp);
                 current_port->input_in_progress = NULL;
             }
@@ -161,6 +169,7 @@ std::priority_queue<tspacket> pqueue;
 
 for (int i = 0; i < NUMPORTS; i++) {
     while (!(ports[i]->inputqueue.empty())) {
+        printf("switch: inputqueue to pqueue\n");
         switchpacket * sp = ports[i]->inputqueue.front();
         ports[i]->inputqueue.pop();
         pqueue.push( tspacket { sp->timestamp, sp });
@@ -170,27 +179,43 @@ for (int i = 0; i < NUMPORTS; i++) {
 // next, put back into individual output queues
 while (!pqueue.empty()) {
     switchpacket * tsp = pqueue.top().switchpack;
+    printf("switch: pqueue tsp: timestamp(%ld) dat_ptr(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
+           tsp->timestamp,
+           tsp->dat,
+           tsp->amtwritten,
+           tsp->amtread,
+           tsp->sender);
     pqueue.pop();
     uint16_t send_to_port = get_port_from_flit(tsp->dat, 0 /* junk remove arg */);
     printf("packet for port: %x\n", send_to_port);
     printf("packet timestamp: %ld\n", tsp->timestamp);
     if (send_to_port == BROADCAST_ADJUSTED) {
 #define ADDUPLINK (NUMUPLINKS > 0 ? 1 : 0)
+        printf("switch: broadcast\n");
         // this will only send broadcasts to the first (zeroeth) uplink.
         // on a switch receiving broadcast packet from an uplink, this should
         // automatically prevent switch from sending the broadcast to any uplink
         for (int i = 0; i < NUMDOWNLINKS + ADDUPLINK; i++) {
+            printf("switch: numdownlinks(%d), numuplinks(%d), iter(%d)\n", NUMDOWNLINKS, ADDUPLINK, i);
             if (i != tsp->sender ) {
                 switchpacket * tsp2 = (switchpacket*)malloc(sizeof(switchpacket));
                 memcpy(tsp2, tsp, sizeof(switchpacket));
                 tsp2->dat = (uint8_t*)malloc(FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
                 memcpy(tsp2->dat, tsp->dat, FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
+                printf("switch: outputqueue tsp2: timestamp(%ld) dat_ptr(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
+                       tsp2->timestamp,
+                       tsp2->dat,
+                       tsp2->amtwritten,
+                       tsp2->amtread,
+                       tsp2->sender);
                 ports[i]->outputqueue.push(tsp2);
             }
         }
+        printf("switch: free pqueue tsp\n");
         free(tsp->dat);
         free(tsp);
     } else {
+        printf("switch: push tsp to send_to_port(%d)\n", send_to_port);
         ports[send_to_port]->outputqueue.push(tsp);
     }
 }
@@ -258,28 +283,34 @@ int main (int argc, char *argv[]) {
     while (true) {
 
         // handle sends
+        //printf("switch: send\n");
 #pragma omp parallel for
         for (int port = 0; port < NUMPORTS; port++) {
             ports[port]->send();
         }
 
         // handle receives. these are blocking per port
+        //printf("switch: recv\n");
 #pragma omp parallel for
         for (int port = 0; port < NUMPORTS; port++) {
             ports[port]->recv();
         }
  
+        //printf("switch: tick_pre\n");
 #pragma omp parallel for
         for (int port = 0; port < NUMPORTS; port++) {
             ports[port]->tick_pre();
         }
 
+        //printf("switch: do_fast_switching\n");
         do_fast_switching();
 
         this_iter_cycles_start += LINKLATENCY; // keep track of time
+        //printf("switch: this_iter_cycles_start(%ld)\n", this_iter_cycles_start);
 
         // some ports need to handle extra stuff after each iteration
         // e.g. shmem ports swapping shared buffers
+        //printf("switch: tick\n");
 #pragma omp parallel for
         for (int port = 0; port < NUMPORTS; port++) {
             ports[port]->tick();

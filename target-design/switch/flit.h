@@ -66,15 +66,17 @@ void write_valid_flit(uint8_t * send_buf, int tokenid) {
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
     uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    //int bitoffset = 43 + (offset * 3);
+    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
-    printf("wvf: flit: item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x)\n",
+    printf("wvf: flit: item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoffset(%d)\n",
             *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
             *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
             *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))));
+            *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
+            offset,
+            bitoffset);
 
-    //int bitoffset = 43 + (offset * 3);
-    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
     *(lrv + (bitoffset / 8)) |= (1 << (bitoffset % 8));
 }
 
@@ -90,15 +92,17 @@ int write_last_flit(uint8_t * send_buf, int tokenid, bool is_last) {
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
     uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    //int bitoffset = 45 + (offset * 3);
+    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
-    printf("wlf: flit: item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x)\n",
+    printf("wlf: flit: item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoffset(%d)\n",
             *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
             *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
             *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
-            *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))));
+            *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
+            offset,
+            bitoffset);
 
-    //int bitoffset = 45 + (offset * 3);
-    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
     *(lrv + (bitoffset / 8)) |= (is_last << (bitoffset % 8));
 }
 
