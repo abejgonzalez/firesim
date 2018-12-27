@@ -111,11 +111,9 @@ for (int port = 0; port < NUMPORTS; port++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
             uint8_t* flit = get_flit(input_port_buf, tokenno);
             
-            printf("switch: postprocess flit: item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x)\n",
-                *((uint64_t*)(flit + (3 * FLIT_SIZE_BYTES))),
-                *((uint64_t*)(flit + (2 * FLIT_SIZE_BYTES))),
-                *((uint64_t*)(flit + (1 * FLIT_SIZE_BYTES))),
-                *((uint64_t*)(flit + (0 * FLIT_SIZE_BYTES))));
+            printf("switch: postprocess flit: (");
+            printArray(flit, FLIT_SIZE_BYTES);
+            printf(")\n");
 
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
