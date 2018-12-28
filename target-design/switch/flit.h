@@ -75,8 +75,8 @@ void write_valid_flit(uint8_t * send_buf, int tokenid) {
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
     uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
-    //int bitoffset = 43 + (offset * 3);
-    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
+    int bitoffset = 43 + (offset * 3);
+    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
     printf("wvf: flit: (");
     printArray(lrv, FLIT_SIZE_BYTES);
@@ -99,8 +99,8 @@ int write_last_flit(uint8_t * send_buf, int tokenid, bool is_last) {
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
     uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
-    //int bitoffset = 45 + (offset * 3);
-    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
+    int bitoffset = 45 + (offset * 3);
+    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
     printf("wlf: flit: (");
     printArray(lrv, FLIT_SIZE_BYTES);
@@ -124,8 +124,8 @@ bool is_valid_flit(uint8_t * recv_buf, int tokenid) {
 
     uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
 
-    //int bitoffset = 43 + (offset * 3);
-    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
+    int bitoffset = 43 + (offset * 3);
+    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
     //printf("ivf: isvflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
     //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
@@ -152,8 +152,8 @@ bool is_last_flit(uint8_t * recv_buf, int tokenid) {
 
     uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
 
-    //int bitoffset = 45 + (offset * 3);
-    int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
+    int bitoffset = 45 + (offset * 3);
+    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
     //printf("ilf: islflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
     //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
