@@ -49,7 +49,7 @@ void write_valid_flit(uint8_t * send_buf, int tokenid) {
     uint64_t * lrv = ((uint64_t*)send_buf) + base*8;
     int bitoffset = 43 + (offset * 3);
 
-    printf("wvf: flit: (%016x) offset(%d) bitoffset(%d)\n", *lrv, offset, bitoffset);
+    printf("wvf: flit: (%016lx) offset(%d) bitoffset(%d)\n", *lrv, offset, bitoffset);
     *lrv |= (1L << bitoffset);
 }
 
@@ -60,20 +60,20 @@ int write_last_flit(uint8_t * send_buf, int tokenid, int is_last) {
     uint64_t * lrv = ((uint64_t*)send_buf) + base*8;
     int bitoffset = 45 + (offset * 3);
 
-    printf("wlf: flit: (%016x) offset(%d) bitoffset(%d)\n", *lrv, offset, bitoffset);
+    printf("wlf: flit: (%016lx) offset(%d) bitoffset(%d)\n", *lrv, offset, bitoffset);
     *lrv |= (((uint64_t)is_last) << bitoffset);
 }
 
 /* get dest mac from flit, then get port from mac */
 uint16_t get_port_from_flit(uint64_t flit, int current_port) {
     
-    printf("gpff: flit(%016x)\n", flit);
+    printf("gpff: flit(%016lx)\n", flit);
     uint16_t is_multicast = (flit >> 16) & 0x1;
     uint16_t flit_low = (flit >> 48) & 0xFFFF; // indicates dest
     uint16_t sendport = (__builtin_bswap16(flit_low));
 
     if (is_multicast)
-	return BROADCAST_ADJUSTED;
+        return BROADCAST_ADJUSTED;
 
     sendport = sendport & 0xFFFF;
     printf("mac: %04x\n", sendport);

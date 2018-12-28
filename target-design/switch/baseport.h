@@ -64,7 +64,8 @@ void BasePort::write_flits_to_output() {
     while (!(outputqueue.empty())) {
         switchpacket *thispacket = outputqueue.front();
 
-        printf("baseport: wfto: outputqueue sp: timestamp(%ld) dat_ptr(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
+        printf("baseport(%d): wfto: outputqueue sp: timestamp(%ld) dat_ptr(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
+                _portNo,
                 thispacket->timestamp,
                 thispacket->dat,
                 thispacket->amtwritten,
@@ -75,7 +76,7 @@ void BasePort::write_flits_to_output() {
         uint64_t outputtimestamp = thispacket->timestamp;
         uint64_t outputtimestampend = outputtimestamp + thispacket->amtwritten;
 
-        printf("baseport: wfto: space_avail(%d) outtimestamp(%ld) outtimestampend(%ld)\n", space_available, outputtimestamp, outputtimestampend);
+        printf("baseport(%d): wfto: space_avail(%d) outtimestamp(%ld) outtimestampend(%ld)\n", _portNo, space_available, outputtimestamp, outputtimestampend);
 
         // confirm that a) we are allowed to send this out based on timestamp
         // b) we are allowed to send this out based on available space (TODO fix)
@@ -101,7 +102,7 @@ void BasePort::write_flits_to_output() {
             printf("intended timestamp: %ld, actual timestamp: %ld, diff %ld\n", outputtimestamp, basetime + flitswritten, (int64_t)(basetime + flitswritten) - (int64_t)(outputtimestamp));
             int i = thispacket->amtread;
             for (;(i < thispacket->amtwritten) && (flitswritten < LINKLATENCY); i++) {
-                printf("baseport: wfto: iter(%d)\n", i);
+                printf("baseport(%d): wfto: iter(%d)\n", _portNo, i);
                 write_last_flit(current_output_buf, flitswritten, i == (thispacket->amtwritten-1));
                 write_valid_flit(current_output_buf, flitswritten);
                 write_flit(current_output_buf, flitswritten, thispacket->dat[i]);
@@ -113,18 +114,18 @@ void BasePort::write_flits_to_output() {
                     flitswritten += (throttle_denom - throttle_numer + 1);
                 else
                     flitswritten++;
-                printf("baseport: wfto: flitswritten(%d)\n", flitswritten);
+                printf("baseport(%d): wfto: flitswritten(%d)\n", _portNo, flitswritten);
             }
             if (i == thispacket->amtwritten) {
                 // we finished sending this packet, so get rid of it
                 outputqueue.pop();
                 free(thispacket);
-                printf("baseport: wfto: outputqueue popped\n");
+                printf("baseport(%d): wfto: outputqueue popped\n", _portNo);
             } else {
                 // we're not done sending this packet, so mark how much has been sent
                 // for the next time
                 thispacket->amtread = i;
-                printf("baseport: wfto: amtread <- %d\n", i);
+                printf("baseport(%d): wfto: amtread <- %d\n", _portNo, i);
                 break;
             }
         } else {

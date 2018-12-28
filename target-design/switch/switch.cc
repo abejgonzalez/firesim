@@ -102,7 +102,7 @@ for (int port = 0; port < NUMPORTS; port++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
             uint64_t flit = get_flit(input_port_buf, tokenno);
 
-            printf("switch: postprocess flit: (%016x)\n", flit);
+            printf("switch: postprocess flit: (%016lx)\n", flit);
 
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
