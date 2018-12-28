@@ -60,7 +60,7 @@ uint8_t* get_flit(uint8_t * recv_buf, int tokenid) {
 void write_flit(uint8_t * send_buf, int tokenid, uint8_t * flit_buf) {
     int base = tokenid / TOKENS_PER_BIGTOKEN;
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
-    printf("gf: tokenid(%d) base(%d) offset(%d)\n", tokenid, base, offset);
+    printf("wf: tokenid(%d) base(%d) offset(%d)\n", tokenid, base, offset);
     memcpy( send_buf + (base * BIGTOKEN_SIZE_BYTES) + (FLIT_SIZE_BYTES * (offset + 1)), flit_buf, FLIT_SIZE_BYTES );
 }
 
