@@ -102,7 +102,7 @@ for (int port = 0; port < NUMPORTS; port++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
             uint64_t flit = get_flit(input_port_buf, tokenno);
 
-            printf("switch: postprocess flit: item0(0x%x)\n", flit);
+            printf("switch: postprocess flit: (%016x)\n", flit);
 
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
@@ -165,7 +165,7 @@ for (int i = 0; i < NUMPORTS; i++) {
 // next, put back into individual output queues
 while (!pqueue.empty()) {
     switchpacket * tsp = pqueue.top().switchpack;
-    printf("switch: pqueue tsp: timestamp(%ld) dat(%x) amtwritten(%d) amtread(%d) sender(%d)\n", 
+    printf("switch: pqueue tsp: timestamp(%ld) dat(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
            tsp->timestamp,
            tsp->dat,
            tsp->amtwritten,
@@ -186,7 +186,7 @@ while (!pqueue.empty()) {
             if (i != tsp->sender ) {
                 switchpacket * tsp2 = (switchpacket*)malloc(sizeof(switchpacket));
                 memcpy(tsp2, tsp, sizeof(switchpacket));
-                printf("switch: outputqueue tsp2: timestamp(%ld) dat(%x) amtwritten(%d) amtread(%d) sender(%d)\n", 
+                printf("switch: outputqueue tsp2: timestamp(%ld) dat(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
                        tsp2->timestamp,
                        tsp2->dat,
                        tsp2->amtwritten,
