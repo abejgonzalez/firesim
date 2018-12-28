@@ -111,13 +111,13 @@ for (int port = 0; port < NUMPORTS; port++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
             uint8_t* flit = get_flit(input_port_buf, tokenno);
             
-            printf("switch: postprocess flit: (");
+            printf("switch: port(%d) inbuf_ptr(%p) postprocess flit: (", port, input_port_buf);
             printArray(flit, FLIT_SIZE_BYTES);
             printf(")\n");
 
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
-                printf("switch: current_port->input_in_progress is setup as current flit\n");
+                printf("switch: current_port(%d)->input_in_progress is setup as current flit\n", port);
                 sp = (switchpacket*)calloc(sizeof(switchpacket), 1);
                 sp->dat = (uint8_t*)calloc(FLIT_SIZE_BYTES, ETH_MAX_WORDS + ETH_EXTRA_FLITS);
                 current_port->input_in_progress = sp;
@@ -130,7 +130,7 @@ for (int port = 0; port < NUMPORTS; port++) {
 
             memcpy( sp->dat + ((sp->amtwritten++) * FLIT_SIZE_BYTES), flit, FLIT_SIZE_BYTES);
             if (is_last_flit(input_port_buf, tokenno)) {
-                printf("switch: last flit, push to inputqueue\n");
+                printf("switch(%d): last flit, push to inputqueue\n", port);
                 current_port->inputqueue.push(sp);
                 current_port->input_in_progress = NULL;
             }
@@ -167,7 +167,7 @@ std::priority_queue<tspacket> pqueue;
 
 for (int i = 0; i < NUMPORTS; i++) {
     while (!(ports[i]->inputqueue.empty())) {
-        printf("switch: inputqueue to pqueue\n");
+        printf("switch(%d): inputqueue to pqueue\n", i);
         switchpacket * sp = ports[i]->inputqueue.front();
         ports[i]->inputqueue.pop();
         pqueue.push( tspacket { sp->timestamp, sp });
@@ -194,13 +194,14 @@ while (!pqueue.empty()) {
         // on a switch receiving broadcast packet from an uplink, this should
         // automatically prevent switch from sending the broadcast to any uplink
         for (int i = 0; i < NUMDOWNLINKS + ADDUPLINK; i++) {
-            printf("switch: numdownlinks(%d), numuplinks(%d), iter(%d)\n", NUMDOWNLINKS, ADDUPLINK, i);
+            printf("switch: port(%d) numdownlinks(%d), numuplinks(%d), iter(%d)\n", i, NUMDOWNLINKS, ADDUPLINK, i);
             if (i != tsp->sender ) {
                 switchpacket * tsp2 = (switchpacket*)malloc(sizeof(switchpacket));
                 memcpy(tsp2, tsp, sizeof(switchpacket));
                 tsp2->dat = (uint8_t*)malloc(FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
                 memcpy(tsp2->dat, tsp->dat, FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
-                printf("switch: outputqueue tsp2: timestamp(%ld) dat_ptr(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
+                printf("switch: port(%d) outputqueue tsp2: timestamp(%ld) dat_ptr(%p) amtwritten(%d) amtread(%d) sender(%d)\n", 
+                       i,
                        tsp2->timestamp,
                        tsp2->dat,
                        tsp2->amtwritten,
