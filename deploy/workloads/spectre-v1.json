@@ -1,0 +1,6 @@
+{
+  "benchmark_name" : "spectre-v1",
+  "common_bootbinary" : "condBranchMispred.riscv",
+  "common_rootfs" : "dummy.ext2",
+  "common_simulation_outputs" : ["uartlog"]
+}
