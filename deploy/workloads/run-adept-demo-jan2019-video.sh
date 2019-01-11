@@ -48,10 +48,8 @@ elif [ "$1" == "run" ]; then
         cat $resultsdir/$demo_name/${demo_name}0/uartlog | spike-dasm &> $resultsdir/$demo_name/${demo_name}0/uartlog_spikedasm
 
         echo "\nPrinting spike-dasm output"
-        cat $resultsdir/$demo_name/${demo_name}0/uartlog_spikedasm | scroll 0.3
-        cat $resultsdir/$demo_name/${demo_name}0/uartlog_spikedasm | scroll 0.3
-        cat $resultsdir/$demo_name/${demo_name}0/uartlog_spikedasm | scroll 0.3
-        cat $resultsdir/$demo_name/${demo_name}0/uartlog_spikedasm | scroll 0.3
-        cat $resultsdir/$demo_name/${demo_name}0/uartlog_spikedasm | scroll 0.3
+        less $resultsdir/$demo_name/${demo_name}0/uartlog_spikedasm
+
+        sleep 10
     done
 fi
