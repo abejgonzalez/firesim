@@ -216,12 +216,12 @@ void simplenic_t::init() {
     return;
 }
 
-//#define TOKENVERIFY
+#define TOKENVERIFY
 
 void simplenic_t::tick() {
     struct timespec tstart, tend;
 
-    #define DEBUG_NIC_PRINT
+    //#define DEBUG_NIC_PRINT
 
     while (true) { // break when we don't have 5k tokens
         uint32_t tokens_this_round = 0;
@@ -264,18 +264,20 @@ void simplenic_t::tick() {
         // tokens over PCIS
         for (int i = 0; i < tokens_this_round; i++) {
             uint64_t TOKENLRV_AND_COUNT = *(((uint64_t*)pcis_read_bufs[currentround])+i*8);
+            //niclog_printf("AJG: 1. TOKENLRV_AND_COUNT: %016lx\n", TOKENLRV_AND_COUNT);
             uint8_t LAST;
-            for (int token_in_bigtoken = 0; token_in_bigtoken < 7; token_in_bigtoken++) {
-                if (TOKENLRV_AND_COUNT & (1L << (43+token_in_bigtoken*3))) {
+            for (int token_in_bigtoken = 0; token_in_bigtoken < TOKENS_PER_BIGTOKEN; token_in_bigtoken++) {
+                // TODO: Figure out how to parameterize this (matches up with the switch functions)
+                if (TOKENLRV_AND_COUNT & (1L << (43 + token_in_bigtoken*3))) {
                     LAST = (TOKENLRV_AND_COUNT >> (45 + token_in_bigtoken*3)) & 0x1;
                     niclog_printf("sending to other node, valid data chunk: "
                                 "%016lx, last %x, sendcycle: %016ld\n",
-                                *((((uint64_t*)pcis_read_bufs[currentround])+i*8)+1+token_in_bigtoken),
-                                LAST, timeelapsed_cycles + i*7 + token_in_bigtoken);
+                                *((((uint64_t*)pcis_read_bufs[currentround]) + i*8) + 1 + token_in_bigtoken),
+                                LAST,
+                                timeelapsed_cycles + i*TOKENS_PER_BIGTOKEN + token_in_bigtoken);
                 }
             }
 
-            //            *((uint64_t*)(pcis_read_buf + i*64)) |= 0x4924900000000000;
             uint32_t thistoken = *((uint32_t*)(pcis_read_bufs[currentround] + i*64));
             if (thistoken != next_token_from_fpga) {
                 niclog_printf("FAIL! Token lost on FPGA interface.\n");
@@ -311,14 +313,17 @@ void simplenic_t::tick() {
         // there should not be tokenverify on this interface
         for (int i = 0; i < tokens_this_round; i++) {
             uint64_t TOKENLRV_AND_COUNT = *(((uint64_t*)pcis_write_bufs[currentround])+i*8);
+            //niclog_printf("AJG: TOKENLRV_AND_COUNT: %016lx\n", TOKENLRV_AND_COUNT);
             uint8_t LAST;
-            for (int token_in_bigtoken = 0; token_in_bigtoken < 7; token_in_bigtoken++) {
-                if (TOKENLRV_AND_COUNT & (1L << (43+token_in_bigtoken*3))) {
+            for (int token_in_bigtoken = 0; token_in_bigtoken < TOKENS_PER_BIGTOKEN; token_in_bigtoken++) {
+                // TODO: AJG: Figure out how to parameterize this
+                if (TOKENLRV_AND_COUNT & (1L << (43 + token_in_bigtoken*3))) {
                     LAST = (TOKENLRV_AND_COUNT >> (45 + token_in_bigtoken*3)) & 0x1;
                     niclog_printf("from other node, valid data chunk: %016lx, "
                                 "last %x, recvcycle: %016ld\n",
-                                *((((uint64_t*)pcis_write_bufs[currentround])+i*8)+1+token_in_bigtoken),
-                                LAST, timeelapsed_cycles + i*7 + token_in_bigtoken);
+                                *((((uint64_t*)pcis_write_bufs[currentround]) + i*8) + 1 + token_in_bigtoken),
+                                LAST,
+                                timeelapsed_cycles + i*TOKENS_PER_BIGTOKEN + token_in_bigtoken);
                 }
             }
         }
