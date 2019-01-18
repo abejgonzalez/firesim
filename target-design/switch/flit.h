@@ -75,6 +75,7 @@ void write_valid_flit(uint8_t * send_buf, int tokenid) {
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
     uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    // TODO: AJG: Figure out parameterization
     int bitoffset = 43 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
@@ -99,6 +100,7 @@ int write_last_flit(uint8_t * send_buf, int tokenid, bool is_last) {
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
     uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    // TODO: AJG: Figure out parameterization
     int bitoffset = 45 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
@@ -124,6 +126,7 @@ bool is_valid_flit(uint8_t * recv_buf, int tokenid) {
 
     uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
 
+    // TODO: AJG: Figure out parameterization
     int bitoffset = 43 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
@@ -152,6 +155,7 @@ bool is_last_flit(uint8_t * recv_buf, int tokenid) {
 
     uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
 
+    // TODO: AJG: Figure out parameterization
     int bitoffset = 45 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
@@ -180,7 +184,7 @@ uint16_t get_port_from_flit(uint8_t* flit_buf, int current_port) {
     printArray(flit_buf, FLIT_SIZE_BYTES);
     printf(")\n");
 
-    // AJG: TODO: Check where in the flit the dest mac is
+    // TODO: AJG: Check where in the flit the dest mac is
     uint16_t is_multicast = (*((uint64_t*)flit_buf) >> 16) & 0x1;
     uint16_t flit_low = (*((uint64_t*)flit_buf) >> 48) & 0xFFFF; // indicates dest
     uint16_t sendport = (__builtin_bswap16(flit_low));
