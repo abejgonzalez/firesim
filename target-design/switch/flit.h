@@ -46,7 +46,7 @@ void printArray(uint8_t* in, uint64_t amt){
 uint8_t* get_flit(uint8_t * recv_buf, int tokenid) {
     int base = tokenid / TOKENS_PER_BIGTOKEN;
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
-    printf("gf: tokenid(%d) base(%d) offset(%d)\n", tokenid, base, offset);
+    printf("    gf: tokenid(%d) base(%d) offset(%d)\n", tokenid, base, offset);
     return (recv_buf + (base * BIGTOKEN_SIZE_BYTES) + (FLIT_SIZE_BYTES * (offset + 1)));
 }
 
@@ -60,7 +60,7 @@ uint8_t* get_flit(uint8_t * recv_buf, int tokenid) {
 void write_flit(uint8_t * send_buf, int tokenid, uint8_t * flit_buf) {
     int base = tokenid / TOKENS_PER_BIGTOKEN;
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
-    printf("wf: tokenid(%d) base(%d) offset(%d)\n", tokenid, base, offset);
+    printf("    wf: tokenid(%d) base(%d) offset(%d)\n", tokenid, base, offset);
     memcpy( send_buf + (base * BIGTOKEN_SIZE_BYTES) + (FLIT_SIZE_BYTES * (offset + 1)), flit_buf, FLIT_SIZE_BYTES );
 }
 
@@ -79,7 +79,7 @@ void write_valid_flit(uint8_t * send_buf, int tokenid) {
     int bitoffset = 43 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
-    printf("wvf: flit: (");
+    printf("    wvf: flit: (");
     printArray(lrv, FLIT_SIZE_BYTES);
     printf(") offset(%d) bitoffset(%d)\n",
             offset,
@@ -104,7 +104,7 @@ int write_last_flit(uint8_t * send_buf, int tokenid, bool is_last) {
     int bitoffset = 45 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
-    printf("wlf: flit: (");
+    printf("    wlf: flit: (");
     printArray(lrv, FLIT_SIZE_BYTES);
     printf(") offset(%d) bitoffset(%d)\n",
             offset,
@@ -130,7 +130,7 @@ bool is_valid_flit(uint8_t * recv_buf, int tokenid) {
     int bitoffset = 43 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
 
-    //printf("ivf: isvflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
+    //printf("    ivf: isvflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
     //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
     //        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
     //        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
@@ -159,7 +159,7 @@ bool is_last_flit(uint8_t * recv_buf, int tokenid) {
     int bitoffset = 45 + (offset * 3);
     //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
 
-    //printf("ilf: islflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
+    //printf("    ilf: islflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
     //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
     //        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
     //        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
@@ -180,7 +180,7 @@ bool is_last_flit(uint8_t * recv_buf, int tokenid) {
  */
 uint16_t get_port_from_flit(uint8_t* flit_buf, int current_port) {
 
-    printf("gpff: flit: (");
+    printf("    gpff: flit: (");
     printArray(flit_buf, FLIT_SIZE_BYTES);
     printf(")\n");
 
@@ -193,7 +193,7 @@ uint16_t get_port_from_flit(uint8_t* flit_buf, int current_port) {
         return BROADCAST_ADJUSTED;
 
     sendport = sendport & 0xFFFF;
-    printf("mac: %04x\n", sendport);
+    printf("    gpff: mac: %04x\n", sendport);
 
     // At this point, we know the MAC address is not a broadcast address,
     // so we can just look up the port in the mac2port table
@@ -203,10 +203,10 @@ uint16_t get_port_from_flit(uint8_t* flit_buf, int current_port) {
         // this has been mapped to "any uplink", so pick one
         int randval = rand() % NUMUPLINKS;
         sendport = randval + NUMDOWNLINKS;
-        printf("sending to random uplink.\n");
-        printf("port: %04x\n", sendport);
+        printf("    gpff: sending to random uplink.\n");
+        printf("    gpff: port: %04x\n", sendport);
     }
-    printf("port: %04x\n", sendport);
+    printf("    gpff: port: %04x\n", sendport);
     return sendport;
 }
 
