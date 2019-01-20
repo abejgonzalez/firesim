@@ -74,18 +74,31 @@ void write_valid_flit(uint8_t * send_buf, int tokenid) {
     int base = tokenid / TOKENS_PER_BIGTOKEN;
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
-    uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
-    // TODO: AJG: Figure out parameterization
-    int bitoffset = 43 + (offset * 3);
-    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
-
+    uint8_t* bigtoken_ptr = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    int tokenbitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
+    printf("    NEW:\n");
     printf("    wvf: flit: (");
-    printArray(lrv, FLIT_SIZE_BYTES);
+    printArray(bigtoken_ptr, FLIT_SIZE_BYTES);
     printf(") offset(%d) bitoffset(%d)\n",
             offset,
-            bitoffset);
+            tokenbitoffset);
+    *(bigtoken_ptr + (tokenbitoffset / 8)) |= (1 << (tokenbitoffset % 8));
+    printf("        after: flit: (");
+    printArray(bigtoken_ptr, FLIT_SIZE_BYTES);
+    printf(")\n");
 
-    *(lrv + (bitoffset / 8)) |= (1 << (bitoffset % 8));
+    //uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    //int bitoffset = 43 + (offset * 3);
+    //printf("    ORIG:\n");
+    //printf("    wvf: flit: (");
+    //printArray(lrv, FLIT_SIZE_BYTES);
+    //printf(") offset(%d) bitoffset(%d)\n",
+    //        offset,
+    //        bitoffset);
+    //*(lrv + (bitoffset / 8)) |= (1 << (bitoffset % 8));
+    //printf("        after: flit: (");
+    //printArray(lrv, FLIT_SIZE_BYTES);
+    //printf(")\n");
 }
 
 /**
@@ -98,19 +111,32 @@ void write_valid_flit(uint8_t * send_buf, int tokenid) {
 int write_last_flit(uint8_t * send_buf, int tokenid, bool is_last) {
     int base = tokenid / TOKENS_PER_BIGTOKEN;
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
-
-    uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
-    // TODO: AJG: Figure out parameterization
-    int bitoffset = 45 + (offset * 3);
-    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
-
+    
+    uint8_t* bigtoken_ptr = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    int tokenbitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
+    printf("    NEW:\n");
     printf("    wlf: flit: (");
-    printArray(lrv, FLIT_SIZE_BYTES);
+    printArray(bigtoken_ptr, FLIT_SIZE_BYTES);
     printf(") offset(%d) bitoffset(%d)\n",
             offset,
-            bitoffset);
+            tokenbitoffset);
+    *(bigtoken_ptr + (tokenbitoffset / 8)) |= (is_last << (tokenbitoffset % 8));
+    printf("        after: flit: (");
+    printArray(bigtoken_ptr, FLIT_SIZE_BYTES);
+    printf(")\n");
 
-    *(lrv + (bitoffset / 8)) |= (is_last << (bitoffset % 8));
+    //uint8_t* lrv = send_buf + (base * BIGTOKEN_SIZE_BYTES);
+    //int bitoffset = 45 + (offset * 3);
+    //printf("    ORIG:\n");
+    //printf("    wlf: flit: (");
+    //printArray(lrv, FLIT_SIZE_BYTES);
+    //printf(") offset(%d) bitoffset(%d)\n",
+    //        offset,
+    //        bitoffset);
+    //*(lrv + (bitoffset / 8)) |= (is_last << (bitoffset % 8));
+    //printf("        after: flit: (");
+    //printArray(lrv, FLIT_SIZE_BYTES);
+    //printf(")\n");
 }
 
 /**
@@ -124,22 +150,23 @@ bool is_valid_flit(uint8_t * recv_buf, int tokenid) {
     int base = tokenid / TOKENS_PER_BIGTOKEN;
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
-    uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
+    uint8_t* bigtoken_ptr = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
+    int tokenbitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
+    return (*(bigtoken_ptr + (tokenbitoffset / 8)) >> (tokenbitoffset % 8)) & 0x1;
 
-    // TODO: AJG: Figure out parameterization
-    int bitoffset = 43 + (offset * 3);
-    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + (offset * 3);
+    //uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
+    //int bitoffset = 43 + (offset * 3);
 
-    //printf("    ivf: isvflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
-    //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
-    //        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
-    //        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
-    //        *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
-    //        *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
-    //        offset,
-    //        bitoffset);
+    ////printf("    ivf: isvflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
+    ////        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
+    ////        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
+    ////        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
+    ////        *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
+    ////        *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
+    ////        offset,
+    ////        bitoffset);
 
-    return (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1;
+    //return (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1;
 }
 
 /**
@@ -153,22 +180,23 @@ bool is_last_flit(uint8_t * recv_buf, int tokenid) {
     int base = tokenid / TOKENS_PER_BIGTOKEN;
     int offset = tokenid % TOKENS_PER_BIGTOKEN;
 
-    uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
+    uint8_t* bigtoken_ptr = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
+    int tokenbitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
+    return (*(bigtoken_ptr + (tokenbitoffset / 8)) >> (tokenbitoffset % 8)) & 0x1;
 
-    // TODO: AJG: Figure out parameterization
-    int bitoffset = 45 + (offset * 3);
-    //int bitoffset = (FLIT_SIZE_BITS - (TOKENS_PER_BIGTOKEN * 3)) + 2 + (offset * 3);
+    //uint8_t* lrv = recv_buf + (base * BIGTOKEN_SIZE_BYTES);
+    //int bitoffset = 45 + (offset * 3);
 
-    //printf("    ilf: islflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
-    //        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
-    //        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
-    //        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
-    //        *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
-    //        *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
-    //        offset,
-    //        bitoffset);
+    ////printf("    ilf: islflit(%d) <- item3(0x%x) item2(0x%x) item1(0x%x) item0(0x%x) offset(%d) bitoff(%d)\n",
+    ////        (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1,
+    ////        *((uint64_t*)(lrv + (3 * FLIT_SIZE_BYTES))),
+    ////        *((uint64_t*)(lrv + (2 * FLIT_SIZE_BYTES))),
+    ////        *((uint64_t*)(lrv + (1 * FLIT_SIZE_BYTES))),
+    ////        *((uint64_t*)(lrv + (0 * FLIT_SIZE_BYTES))),
+    ////        offset,
+    ////        bitoffset);
 
-    return (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1;
+    //return (*(lrv + (bitoffset / 8)) >> (bitoffset % 8)) & 0x1;
 }
 
 /**

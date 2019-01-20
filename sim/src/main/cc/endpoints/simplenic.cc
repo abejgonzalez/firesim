@@ -12,15 +12,21 @@
 
 #include <sys/mman.h>
 
-// DO NOT MODIFY PARAMS BELOW THIS LINE
 
-#define MAX_BANDWIDTH       (200) // This is FLIT_SIZE*PROC_SPEED rounded to the nearest 100
-#define MAX_BANDWIDTH_BITS   (8) // This is the amount of bits to hold the MAX_BANDWIDTH value
+// PARAMETERS FOR NETWORK SIZE
+//#define MAX_BANDWIDTH       (200) // This is FLIT_SIZE*PROC_SPEED rounded to the nearest 100
+//#define MAX_BANDWIDTH_BITS    (8) // This is the amount of bits to hold the MAX_BANDWIDTH value
+//#define FLIT_WIDTH_BITS      (64) // Size of the network interface
+#define MAX_BANDWIDTH        (800) // This is FLIT_SIZE*PROC_SPEED rounded to the nearest 100
+#define MAX_BANDWIDTH_BITS    (10) // This is the amount of bits to hold the MAX_BANDWIDTH value
+#define FLIT_WIDTH_BITS      (256) // Size of the network interface
+
+// DO NOT MODIFY PARAMS BELOW THIS LINE
 #define PCIE_WIDTH_BITS     (512) // Size of the PCIE interface
 #define PROC_SPEED_GHZ      (3.2) // Assumed processor speed
 #define VAL_BITS              (3) // Extra bits associated with a flit
 #define EXTRA_BYTES           (1)
-#define FLIT_WIDTH_BITS      (64) // Size of the network interface
+#define FLIT_WIDTH_BYTES     (FLIT_WIDTH_BITS/8) // Size of the network interface
 #define BUF_WIDTH_BITS       (64) // Size of the AXI4 interface
 #define TOKENS_PER_BIGTOKEN (PCIE_WIDTH_BITS / (FLIT_WIDTH_BITS + VAL_BITS)) // Amount of smaller tokens per BigToken
 #define SIMLATENCY_BT       ((this->LINKLATENCY) / TOKENS_PER_BIGTOKEN)
@@ -216,12 +222,16 @@ void simplenic_t::init() {
     return;
 }
 
-#define TOKENVERIFY
 
 void simplenic_t::tick() {
     struct timespec tstart, tend;
 
     //#define DEBUG_NIC_PRINT
+    #define TOKENVERIFY
+
+    #ifdef TOKENVERIFY
+    #define niclog_printArray(in, amtpass) int amt = amtpass; while(--amt > 0){ niclog_printf("%02x.", *((unsigned char*)(in + amt))); }; niclog_printf("%02x", *((unsigned char*)(in)));
+    #endif
 
     while (true) { // break when we don't have 5k tokens
         uint32_t tokens_this_round = 0;
@@ -263,16 +273,17 @@ void simplenic_t::tick() {
         // incrementing for each sent token. verify that we are not losing
         // tokens over PCIS
         for (int i = 0; i < tokens_this_round; i++) {
-            uint64_t TOKENLRV_AND_COUNT = *(((uint64_t*)pcis_read_bufs[currentround])+i*8);
-            //niclog_printf("AJG: 1. TOKENLRV_AND_COUNT: %016lx\n", TOKENLRV_AND_COUNT);
+            char* TOKENLRV_AND_COUNT_PTR = pcis_read_bufs[currentround] + i*(PCIE_WIDTH_BITS/8);
+
             uint8_t LAST;
             for (int token_in_bigtoken = 0; token_in_bigtoken < TOKENS_PER_BIGTOKEN; token_in_bigtoken++) {
-                // TODO: Figure out how to parameterize this (matches up with the switch functions)
-                if (TOKENLRV_AND_COUNT & (1L << (43 + token_in_bigtoken*3))) {
-                    LAST = (TOKENLRV_AND_COUNT >> (45 + token_in_bigtoken*3)) & 0x1;
-                    niclog_printf("sending to other node, valid data chunk: "
-                                "%016lx, last %x, sendcycle: %016ld\n",
-                                *((((uint64_t*)pcis_read_bufs[currentround]) + i*8) + 1 + token_in_bigtoken),
+                uint64_t LRV = *((uint64_t*)(TOKENLRV_AND_COUNT_PTR + FLIT_WIDTH_BYTES - 8)) >> (64 - TOKENS_PER_BIGTOKEN*3);
+                if ( LRV & 0x1 ){
+                    LAST = (LRV >> 2) & 0x1;
+
+                    niclog_printf("sending to other node, valid data chunk: ");
+                    niclog_printArray( ( pcis_read_bufs[currentround] + i*(PCIE_WIDTH_BITS/8) ) + (1 + token_in_bigtoken)*(FLIT_WIDTH_BYTES), FLIT_WIDTH_BYTES);
+                    niclog_printf(", last %x, sendcycle: %016ld\n",
                                 LAST,
                                 timeelapsed_cycles + i*TOKENS_PER_BIGTOKEN + token_in_bigtoken);
                 }
@@ -312,16 +323,17 @@ void simplenic_t::tick() {
         // this does not do tokenverify - it's just printing tokens
         // there should not be tokenverify on this interface
         for (int i = 0; i < tokens_this_round; i++) {
-            uint64_t TOKENLRV_AND_COUNT = *(((uint64_t*)pcis_write_bufs[currentround])+i*8);
-            //niclog_printf("AJG: TOKENLRV_AND_COUNT: %016lx\n", TOKENLRV_AND_COUNT);
+            char* TOKENLRV_AND_COUNT_PTR = pcis_read_bufs[currentround] + i*(PCIE_WIDTH_BITS/8);
+            
             uint8_t LAST;
             for (int token_in_bigtoken = 0; token_in_bigtoken < TOKENS_PER_BIGTOKEN; token_in_bigtoken++) {
-                // TODO: AJG: Figure out how to parameterize this
-                if (TOKENLRV_AND_COUNT & (1L << (43 + token_in_bigtoken*3))) {
-                    LAST = (TOKENLRV_AND_COUNT >> (45 + token_in_bigtoken*3)) & 0x1;
-                    niclog_printf("from other node, valid data chunk: %016lx, "
-                                "last %x, recvcycle: %016ld\n",
-                                *((((uint64_t*)pcis_write_bufs[currentround]) + i*8) + 1 + token_in_bigtoken),
+                uint64_t LRV = *((uint64_t*)(TOKENLRV_AND_COUNT_PTR + FLIT_WIDTH_BYTES - 8)) >> (64 - TOKENS_PER_BIGTOKEN*3);
+                if ( LRV & 0x1 ){
+                    LAST = (LRV >> 2) & 0x1;
+
+                    niclog_printf("from other node, valid data chunk: ");
+                    niclog_printArray( ( pcis_write_bufs[currentround] + i*(PCIE_WIDTH_BITS/8) ) + (1 + token_in_bigtoken)*(FLIT_WIDTH_BYTES), FLIT_WIDTH_BYTES);
+                    niclog_printf(", last %x, recvcycle: %016ld\n",
                                 LAST,
                                 timeelapsed_cycles + i*TOKENS_PER_BIGTOKEN + token_in_bigtoken);
                 }

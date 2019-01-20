@@ -55,11 +55,13 @@ int throttle_denom = 1;
 #include "switchconfig.h"
 #undef NUMCLIENTSCONFIG
 
+// PARAMETERS FOR NETWORK SIZE
+#define MAX_BW (800)
+#define FLIT_SIZE_BITS (256)
+//#define MAX_BW (200)
+//#define FLIT_SIZE_BITS (64)
+
 // DO NOT TOUCH
-//#define MAX_BW (800)
-//#define FLIT_SIZE_BITS (256)
-#define MAX_BW (200)
-#define FLIT_SIZE_BITS (64)
 #define BIGTOKEN_SIZE_BITS (512)
 #define NUM_TOKENS (LINKLATENCY)
 
@@ -111,13 +113,13 @@ for (int port = 0; port < NUMPORTS; port++) {
         if (is_valid_flit(input_port_buf, tokenno)) {
             uint8_t* flit = get_flit(input_port_buf, tokenno);
             
-            printf("switch: port(%d) inbuf_ptr(%p) postprocess flit: (", port, input_port_buf);
+            printf("PORT[%d]: inbuf_ptr(%p) postprocess flit: (", port, input_port_buf);
             printArray(flit, FLIT_SIZE_BYTES);
             printf(")\n");
 
             switchpacket * sp;
             if (!(current_port->input_in_progress)) {
-                printf("switch: current_port(%d)->input_in_progress is setup as current flit\n", port);
+                printf("PORT[%d]: current_port->input_in_progress is setup as current flit\n", port);
                 sp = (switchpacket*)calloc(sizeof(switchpacket), 1);
                 sp->dat = (uint8_t*)calloc(FLIT_SIZE_BYTES, ETH_MAX_WORDS + ETH_EXTRA_FLITS);
                 current_port->input_in_progress = sp;
