@@ -269,9 +269,9 @@ int main (int argc, char *argv[]) {
     fprintf(stdout, "Using switching latency: %d\n", SWITCHLATENCY);
     fprintf(stdout, "BW throttle set to %d/%d\n", throttle_numer, throttle_denom);
 
-    if ((LINKLATENCY % 7) != 0) {
+    if ((LINKLATENCY % TOKENS_PER_BIGTOKEN) != 0) {
         // if invalid link latency, error out.
-        fprintf(stdout, "INVALID LINKLATENCY. Currently must be multiple of 7 cycles.\n");
+        fprintf(stdout, "INVALID LINKLATENCY. Currently must be multiple of %d cycles.\n", TOKENS_PER_BIGTOKEN);
         exit(1);
     }
 
