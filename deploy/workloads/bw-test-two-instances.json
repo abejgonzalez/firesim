@@ -1,6 +1,6 @@
 {
   "benchmark_name" : "bw-test-two-instances",
-  "common_simulation_outputs" : ["uartlog"],
+  "common_simulation_outputs" : ["uartlog", "printflog"],
   "common_rootfs" : "dummy.ext2",
   "workloads" : [
     {

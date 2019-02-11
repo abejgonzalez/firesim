@@ -187,6 +187,7 @@ class FireSimConfig extends Config(
   new WithDesiredHostFrequency(90) ++
   new WithSerialWidget ++
   new WithUARTWidget ++
+  new WithPrintfSynthesis ++
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new WithDefaultMemModel ++
@@ -245,6 +246,7 @@ class FireSimDDR3FRFCFSLLC4MBConfig extends Config(
   new WithDesiredHostFrequency(90) ++
   new WithSerialWidget ++
   new WithUARTWidget ++
+  new WithPrintfSynthesis ++
   new WithSimpleNICWidget ++
   new WithBlockDevWidget ++
   new FRFCFS16GBQuadRankLLC4MB ++

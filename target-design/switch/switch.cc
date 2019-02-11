@@ -123,8 +123,14 @@ for (int port = 0; port < NUMPORTS; port++) {
             }
             sp = current_port->input_in_progress;
 
+            printf("[PORT %d]: Putting flit in packet\n", port);
+            printf("               Flit: ");
+            printArray(flit, FLIT_SIZE_BYTES);
+            printf("\n");
+
             memcpy( sp->dat + ((sp->amtwritten++) * FLIT_SIZE_BYTES), flit, FLIT_SIZE_BYTES);
             if (is_last_flit(input_port_buf, tokenno)) {
+                printf("[PORT %d]: Putting above flits in switchpacket\n", port);
                 current_port->inputqueue.push(sp);
                 current_port->input_in_progress = NULL;
             }
@@ -187,14 +193,14 @@ while (!pqueue.empty()) {
                 tsp2->dat = (uint8_t*)malloc(FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
                 memcpy(tsp2->dat, tsp->dat, FLIT_SIZE_BYTES*(ETH_MAX_WORDS + ETH_EXTRA_FLITS));
                 ports[i]->outputqueue.push(tsp2);
-                //printf("[SWITCH]: Switch packet sent from PORT %d to PORT %d\n", tsp->sender, i);
+                printf("[SWITCH]: Switch packet sent from PORT %d to PORT %d\n", tsp->sender, i);
             }
         }
         //printf("[SWITCH]: Free switch packet\n");
         free(tsp->dat);
         free(tsp);
     } else {
-        //printf("[SWITCH]: Send switch packet to PORT %d\n", send_to_port);
+        printf("[SWITCH]: Send switch packet to PORT %d\n", send_to_port);
         ports[send_to_port]->outputqueue.push(tsp);
     }
 }
