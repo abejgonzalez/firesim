@@ -11,7 +11,7 @@
 #include <omp.h>
 #include <cstdlib>
 
-#define IGNORE_PRINTF
+//#define IGNORE_PRINTF
 
 #ifdef IGNORE_PRINTF
 #define printf(fmt, ...) (0)
@@ -178,8 +178,8 @@ while (!pqueue.empty()) {
     switchpacket * tsp = pqueue.top().switchpack;
     pqueue.pop();
     uint16_t send_to_port = get_port_from_flit(tsp->dat, 0 /* junk remove arg */);
-    printf("[SWITCH] packet for port: %x\n", send_to_port);
-    printf("[SWITCH] packet timestamp: %ld\n", tsp->timestamp);
+    //printf("[SWITCH] packet for port: %x\n", send_to_port);
+    //printf("[SWITCH] packet timestamp: %ld\n", tsp->timestamp);
     if (send_to_port == BROADCAST_ADJUSTED) {
 #define ADDUPLINK (NUMUPLINKS > 0 ? 1 : 0)
         //printf("[SWITCH]: Broadcast\n");

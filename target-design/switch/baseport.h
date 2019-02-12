@@ -90,11 +90,11 @@ void BasePort::write_flits_to_output() {
             uint64_t timestampdiff = outputtimestamp > basetime ? outputtimestamp - basetime : 0L;
             flitswritten = std::max(flitswritten, timestampdiff);
 
-            printf("[BASE_PORT %d]: intended timestamp: %ld, actual timestamp: %ld, diff %ld\n",
-                    _portNo,
-                    outputtimestamp,
-                    basetime + flitswritten,
-                    (int64_t)(basetime + flitswritten) - (int64_t)(outputtimestamp));
+            //printf("[BASE_PORT %d]: intended timestamp: %ld, actual timestamp: %ld, diff %ld\n",
+            //        _portNo,
+            //        outputtimestamp,
+            //        basetime + flitswritten,
+            //        (int64_t)(basetime + flitswritten) - (int64_t)(outputtimestamp));
 
             int i = thispacket->amtread;
             for (;(i < thispacket->amtwritten) && (flitswritten < LINKLATENCY); i++) {
@@ -112,10 +112,10 @@ void BasePort::write_flits_to_output() {
             }
             if (i == thispacket->amtwritten) {
                 // we finished sending this packet, so get rid of it
-                //printf("[BASE_PORT %d]: packet timestamp: %ld, len: %ld\n",
-                //        _portNo,
-                //        basetime + flitswritten,
-                //        thispacket->amtwritten);
+                printf("[BASE_PORT %d]: packet timestamp: %ld, len: %ld\n",
+                        _portNo,
+                        basetime + flitswritten,
+                        thispacket->amtwritten);
                 outputqueue.pop();
                 free(thispacket->dat);
                 free(thispacket);
