@@ -67,7 +67,28 @@ flags.DEFINE_integer('terminatesomef116', -1, 'DEPRECATED. Use --terminatesome=f
 flags.DEFINE_integer('terminatesomef12', -1, 'DEPRECATED. Use --terminatesome=f1.2xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.2xlarges.')
 flags.DEFINE_integer('terminatesomef14', -1, 'DEPRECATED. Use --terminatesome=f1.4xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.4xlarges.')
 flags.DEFINE_integer('terminatesomem416', -1, 'DEPRECATED. Use --terminatesome=m4.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched m4.16xlarges.')
+
+def terminatesomesplitter(raw_arg: str) -> Tuple[str, int]:
+    """Splits a string of form 'instance_type:count' into a tuple."""
+    split_arg = raw_arg.split(":")
+    if len(split_arg) != 2:
+        raise ValueError("Argument must be of form 'instance_type:count'")
+    try:
+        count = int(split_arg[1])
+    except ValueError as e:
+        raise ValueError(f"Count in '{raw_arg}' is not an integer.") from e
+    return split_arg[0], count
+
 flags.DEFINE_multi_string('terminatesome', [], 'Only used by terminaterunfarm. Used to specify a restriction on how many instances to terminate. E.g., --terminatesome=f1.2xlarge:2 will terminate only 2 of the f1.2xlarge instances in the runfarm, regardless of what other instances are in the runfarm. This argument can be specified multiple times to terminate additional instance types/counts. Behavior when specifying the same instance type multiple times is undefined. This replaces the old --terminatesome{f116,f12,f14,m416} arguments. Behavior when specifying these old-style terminatesome flags and this new style flag at the same time is also undefined.')
+@flags.validator('terminatesome')
+def _check_terminatesome(terminatesome_list: List[str]) -> bool:
+    """Ensures --terminatesome flags are formatted correctly."""
+    for terminatesome_arg in terminatesome_list:
+        try:
+            terminatesomesplitter(terminatesome_arg)
+        except ValueError as e:
+            raise flags.ValidationError(f"Invalid --terminatesome value: '{terminatesome_arg}'. {e}")
+    return True
 
 # from  https://github.com/pandas-dev/pandas/blob/96b036cbcf7db5d3ba875aac28c4f6a678214bfb/pandas/io/common.py#L73
 _RFC_3986_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+\-+.]*://")
@@ -1188,16 +1209,10 @@ class RuntimeConfig:
     def terminate_run_farm(self) -> None:
         """directly called by top-level terminaterunfarm command."""
         terminate_some_dict = {}
-        if FLAGS.terminatesome is not None:
-            # TODO: this is done not at arg parsing time.
-            # maybe convert this to a special absl flag so that checking + resolving to pair can happen early?
-            def terminatesomesplitter(raw_arg):
-                split_arg = raw_arg.split(":")
-                assert len(split_arg) == 2, "Invalid terminatesome argument"
-                return split_arg[0], int(split_arg[1])
+        if FLAGS.terminatesome:
             for pair in FLAGS.terminatesome:
                 key, val = terminatesomesplitter(pair)
-                terminate_some_dict[key] = pair[val]
+                terminate_some_dict[key] = val
 
         def old_style_terminate_args(instance_type, arg_val, arg_flag_str):
             if arg_val != -1:
