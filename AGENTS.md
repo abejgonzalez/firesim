@@ -60,7 +60,7 @@ source sourceme-manager.sh --skip-ssh-setup
 
 This command should add the FireSim manager to the path, setup the ``conda`` environment used to provide more tools to the ``PATH``, and more.
 
-## 3. Testing and Coding Guidelines
+## 3. Testing and Coding Checks
 
 Tests for the repository use CI found in the ``.github`` folder using Github Actions.
 These are a non-exhaustive list of tests that you can use to check code (i.e. linting, syntax checking).
@@ -71,7 +71,7 @@ To do so, you can run the following command to verify that it is sourced properl
 [[ "${FIRESIM_ENV_SOURCED+x}" && "$FIRESIM_ENV_SOURCED" == "1" ]]
 ```
 
-### Coding Guidelines
+### Coding checks
 
 For Scala code, use the ``run-scala-lint`` tests in the GitHub Actions workflow file.
 Scala code uses ScalaFix and ScalaFmt found in the ``sim/.scalafix.conf`` and ``sim/.scalafmt.conf`` files.
@@ -90,3 +90,9 @@ This should build the default Verilog and C++ using ``make`` and then compile th
 
 Avoid testing directly with the FireSim manager (i.e., running ``launchrunfarm``, or other manager tasks).
 This is because these tests require changes to the ``config_*.yaml`` files in the ``deploy`` directory which require user intervention.
+
+## 4. General Guidance
+
+Be concise as possible.
+Do not modify code that is unrelated to any change.
+Match syntax and formatting of existing code in the same file.
