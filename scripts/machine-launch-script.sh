@@ -255,6 +255,7 @@ set -o pipefail
         fsspec \
         "s3fs==0.4.2" \
         "cryptography<41" \
+        absl-py \
     )
 
     if [[ "$CONDA_ENV_NAME" == "base" ]]; then

@@ -21,6 +21,7 @@ from uuid import uuid1
 from tempfile import TemporaryDirectory
 import hashlib
 import json
+from absl import flags
 
 from awstools.awstools import aws_resource_names
 from awstools.afitools import (
@@ -48,8 +49,6 @@ from buildtools.bitbuilder import get_deploy_dir
 from util.io import downloadURI
 
 from typing import Optional, Dict, Any, List, Sequence, Tuple, TYPE_CHECKING
-import argparse  # this is not within a if TYPE_CHECKING: scope so the `register_task` in FireSim can evaluate it's annotation
-
 if TYPE_CHECKING:
     from runtools.utils import MacAddress
 
@@ -58,6 +57,17 @@ LOCAL_DRIVERS_GENERATED_SRC = "../sim/generated-src"
 CUSTOM_RUNTIMECONFS_BASE = "../sim/custom-runtime-configs"
 
 rootLogger = logging.getLogger()
+
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string('runtimeconfigfile', 'config_runtime.yaml', 'Optional custom runtime/workload config file.')
+flags.DEFINE_string('hwdbconfigfile', 'config_hwdb.yaml', 'Optional custom HW database config file.')
+flags.DEFINE_string('overrideconfigdata', "", 'Override a single value from one of the the RUNTIME e.g.: --overrideconfigdata "target-config link-latency 6405".')
+flags.DEFINE_integer('terminatesomef116', -1, 'DEPRECATED. Use --terminatesome=f1.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.16xlarges.')
+flags.DEFINE_integer('terminatesomef12', -1, 'DEPRECATED. Use --terminatesome=f1.2xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.2xlarges.')
+flags.DEFINE_integer('terminatesomef14', -1, 'DEPRECATED. Use --terminatesome=f1.4xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.4xlarges.')
+flags.DEFINE_integer('terminatesomem416', -1, 'DEPRECATED. Use --terminatesome=m4.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched m4.16xlarges.')
+flags.DEFINE_multi_string('terminatesome', [], 'Only used by terminaterunfarm. Used to specify a restriction on how many instances to terminate. E.g., --terminatesome=f1.2xlarge:2 will terminate only 2 of the f1.2xlarge instances in the runfarm, regardless of what other instances are in the runfarm. This argument can be specified multiple times to terminate additional instance types/counts. Behavior when specifying the same instance type multiple times is undefined. This replaces the old --terminatesome{f116,f12,f14,m416} arguments. Behavior when specifying these old-style terminatesome flags and this new style flag at the same time is also undefined.')
 
 # from  https://github.com/pandas-dev/pandas/blob/96b036cbcf7db5d3ba875aac28c4f6a678214bfb/pandas/io/common.py#L73
 _RFC_3986_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+\-+.]*://")
@@ -1003,24 +1013,24 @@ class InnerRuntimeConfiguration:
     metasimulation_only_vcs_plusargs: str
     default_plusarg_passthrough: str
 
-    def __init__(self, runtimeconfigfile: str, configoverridedata: str) -> None:
+    def __init__(self) -> None:
 
         runtime_configfile = None
-        with open(runtimeconfigfile, "r") as yaml_file:
+        with open(FLAGS.runtimeconfigfile, "r") as yaml_file:
             runtime_configfile = yaml.safe_load(yaml_file)
 
         runtime_dict = runtime_configfile
 
         # override parts of the runtime conf if specified
-        if configoverridedata != "":
+        if FLAGS.overrideconfigdata != "":
             ## handle overriding part of the runtime conf
-            configoverrideval = configoverridedata.split()
+            configoverrideval = FLAGS.overrideconfigdata.split()
             overridesection = configoverrideval[0]
             overridefield = configoverrideval[1]
             overridevalue = configoverrideval[2]
             rootLogger.warning("Overriding part of the runtime config with: ")
-            rootLogger.warning("""[{}]""".format(overridesection))
-            rootLogger.warning(overridefield + "=" + overridevalue)
+            rootLogger.warning(f'"[{overridesection}]"')
+            rootLogger.warning(f"{overridefield}={overridevalue}")
             runtime_dict[overridesection][overridefield] = overridevalue
 
         def dict_assert(key_check, dict_name):
@@ -1107,7 +1117,6 @@ class RuntimeConfig:
     simulation tasks."""
 
     launch_time: str
-    args: argparse.Namespace
     runtimehwdb: RuntimeHWDB
     innerconf: InnerRuntimeConfiguration
     run_farm: RunFarm
@@ -1115,25 +1124,21 @@ class RuntimeConfig:
     firesim_topology_with_passes: FireSimTopologyWithPasses
     runtime_build_recipes: RuntimeBuildRecipes
 
-    def __init__(self, args: argparse.Namespace) -> None:
+    def __init__(self) -> None:
         """This reads runtime configuration files, massages them into formats that
         the rest of the manager expects, and keeps track of other info."""
         self.launch_time = strftime("%Y-%m-%d--%H-%M-%S", gmtime())
 
-        self.args = args
-
         # construct pythonic db of hardware configurations available to us at
         # runtime.
-        self.runtimehwdb = RuntimeHWDB(args.hwdbconfigfile)
+        self.runtimehwdb = RuntimeHWDB(FLAGS.hwdbconfigfile)
         rootLogger.debug(self.runtimehwdb)
 
-        self.innerconf = InnerRuntimeConfiguration(
-            args.runtimeconfigfile, args.overrideconfigdata
-        )
+        self.innerconf = InnerRuntimeConfiguration()
         rootLogger.debug(self.innerconf)
 
         self.runtime_build_recipes = RuntimeBuildRecipes(
-            args.buildrecipesconfigfile,
+            FLAGS.buildrecipesconfigfile,
             self.innerconf.metasimulation_host_simulator,
             self.innerconf.metasimulation_only_plusargs,
             self.innerconf.metasimulation_only_vcs_plusargs,
@@ -1144,7 +1149,7 @@ class RuntimeConfig:
 
         # setup workload config obj, aka a list of workloads that can be assigned
         # to a server
-        if args.task != "enumeratefpgas":
+        if FLAGS.task != "enumeratefpgas":
             self.workload = WorkloadConfig(
                 self.innerconf.workload_name, self.launch_time, self.innerconf.suffixtag
             )
@@ -1183,9 +1188,16 @@ class RuntimeConfig:
     def terminate_run_farm(self) -> None:
         """directly called by top-level terminaterunfarm command."""
         terminate_some_dict = {}
-        if self.args.terminatesome is not None:
-            for pair in self.args.terminatesome:
-                terminate_some_dict[pair[0]] = pair[1]
+        if FLAGS.terminatesome is not None:
+            # TODO: this is done not at arg parsing time.
+            # maybe convert this to a special absl flag so that checking + resolving to pair can happen early?
+            def terminatesomesplitter(raw_arg):
+                split_arg = raw_arg.split(":")
+                assert len(split_arg) == 2, "Invalid terminatesome argument"
+                return split_arg[0], int(split_arg[1])
+            for pair in FLAGS.terminatesome:
+                key, val = terminatesomesplitter(pair)
+                terminate_some_dict[key] = pair[val]
 
         def old_style_terminate_args(instance_type, arg_val, arg_flag_str):
             if arg_val != -1:
@@ -1197,19 +1209,19 @@ class RuntimeConfig:
                 terminate_some_dict[instance_type] = arg_val
 
         old_style_terminate_args(
-            "f1.16xlarge", self.args.terminatesomef116, "--terminatesomef116"
+            "f1.16xlarge", FLAGS.terminatesomef116, "--terminatesomef116"
         )
         old_style_terminate_args(
-            "f1.4xlarge", self.args.terminatesomef14, "--terminatesomef14"
+            "f1.4xlarge", FLAGS.terminatesomef14, "--terminatesomef14"
         )
         old_style_terminate_args(
-            "f1.2xlarge", self.args.terminatesomef12, "--terminatesomef12"
+            "f1.2xlarge", FLAGS.terminatesomef12, "--terminatesomef12"
         )
         old_style_terminate_args(
-            "m4.16xlarge", self.args.terminatesomem416, "--terminatesomem416"
+            "m4.16xlarge", FLAGS.terminatesomem416, "--terminatesomem416"
         )
 
-        self.run_farm.terminate_run_farm(terminate_some_dict, self.args.forceterminate)
+        self.run_farm.terminate_run_farm(terminate_some_dict, FLAGS.forceterminate)
 
     def infrasetup(self) -> None:
         """directly called by top-level infrasetup command."""

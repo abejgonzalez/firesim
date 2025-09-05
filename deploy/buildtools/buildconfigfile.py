@@ -5,6 +5,7 @@ import pprint
 import logging
 import sys
 import yaml
+from absl import flags
 
 from runtools.runtime_config import RuntimeHWDB
 from buildtools.buildconfig import BuildConfig
@@ -14,9 +15,18 @@ from util.deepmerge import deep_merge
 
 # imports needed for python type checking
 from typing import Dict, Optional, List, Set, Type, Any, TYPE_CHECKING
-import argparse  # this is not within a if TYPE_CHECKING: scope so the `register_task` in FireSim can evaluate it's annotation
+if TYPE_CHECKING:
+    from absl.flags import FlagValues
 
 rootLogger = logging.getLogger()
+
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string('buildconfigfile', 'config_build.yaml', 'Optional custom build config file.')
+flags.DEFINE_string('buildrecipesconfigfile', 'config_build_recipes.yaml', 'Optional custom build recipe config file.')
+flags.DEFINE_string('buildfarmconfigfile', 'config_build_farm.yaml', 'Optional custom build farm config file.')
+flags.DEFINE_string('launchtime', None, 'Give the "Y-m-d--H-M-S" prefix of results-build directory. Useful for tar2afi when finishing a partial buildafi')
+flags.DEFINE_boolean('forceterminate', False, 'For terminaterunfarm and buildbitstream, force termination without prompting user for confirmation.')
 
 
 class BuildConfigFile:
@@ -35,7 +45,6 @@ class BuildConfigFile:
         build_config_recipes_file_path: Path to build config recipes file
     """
 
-    args: argparse.Namespace
     forceterminate: bool
     agfistoshare: List[str]
     acctids_to_sharewith: List[str]
@@ -47,22 +56,20 @@ class BuildConfigFile:
     build_config_file_path: str
     build_config_recipes_file_path: str
 
-    def __init__(self, args: argparse.Namespace) -> None:
+    def __init__(self) -> None:
         """
         Args:
             args: Object holding arg attributes.
         """
-        if args.launchtime:
-            launch_time = args.launchtime
+        if FLAGS.launchtime:
+            launch_time = FLAGS.launchtime
         else:
             launch_time = strftime("%Y-%m-%d--%H-%M-%S", gmtime())
 
-        self.args = args
-
-        self.forceterminate = args.forceterminate
+        self.forceterminate = FLAGS.forceterminate
 
         global_build_config_file = None
-        with open(args.buildconfigfile, "r") as yaml_file:
+        with open(FLAGS.buildconfigfile, "r") as yaml_file:
             global_build_config_file = yaml.safe_load(yaml_file)
 
         # aws specific options
@@ -75,11 +82,11 @@ class BuildConfigFile:
         self.num_builds = len(builds_to_run_list)
 
         build_recipes_config_file = None
-        with open(args.buildrecipesconfigfile, "r") as yaml_file:
+        with open(FLAGS.buildrecipesconfigfile, "r") as yaml_file:
             build_recipes_config_file = yaml.safe_load(yaml_file)
 
-        self.build_config_file_path = args.buildconfigfile
-        self.build_config_recipes_file_path = args.buildrecipesconfigfile
+        self.build_config_file_path = FLAGS.buildconfigfile
+        self.build_config_recipes_file_path = FLAGS.buildrecipesconfigfile
 
         build_recipes = dict()
         for section_name, section_dict in build_recipes_config_file.items():
@@ -93,7 +100,7 @@ class BuildConfigFile:
                         f"Error constructing build recipe '{section_name}'"
                     ) from e
 
-        self.hwdb = RuntimeHWDB(args.hwdbconfigfile)
+        self.hwdb = RuntimeHWDB(FLAGS.hwdbconfigfile)
 
         self.builds_list = list(map(lambda x: build_recipes[x], builds_to_run_list))
         self.build_ip_set = set()
@@ -172,7 +179,7 @@ class BuildConfigFile:
         assert False, f"Unable to find build config associated with {nodeip}"
 
     def __repr__(self) -> str:
-        return f"< {type(self)}(file={self.args.buildconfigfile!r}, recipes={self.args.buildrecipesconfigfile!r}, build_farm={self.build_farm!r}) @{id(self)} >"
+        return f"< {type(self)}(file={FLAGS.buildconfigfile!r}, recipes={FLAGS.buildrecipesconfigfile!r}, build_farm={self.build_farm!r}) @{id(self)} >"
 
     def __str__(self) -> str:
         return pprint.pformat(vars(self), width=1, indent=10)

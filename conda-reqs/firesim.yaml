@@ -103,6 +103,7 @@ dependencies:
     # packages so that the environment is consistent
     - colorama
     - argcomplete
+    - absl-py
     - python-graphviz
     - pyparsing
     - numpy
