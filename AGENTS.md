@@ -77,8 +77,10 @@ For Scala code, use the ``run-scala-lint`` tests in the GitHub Actions workflow 
 Scala code uses ScalaFix and ScalaFmt found in the ``sim/.scalafix.conf`` and ``sim/.scalafmt.conf`` files.
 For Python code, use the ``run-python-lint`` tests in the Github Actions workflow file.
 For formatting, Python code uses Python Black.
+Additionally, for formatting, removing the ``--check`` flag to the formatting script will format files.
 For typechecking, Python code uses ``mypy``.
 For C++ code, testing is currently disabled for linting.
+Formatting checks should be the last change done.
 
 ### Running an end-to-end smoke test
 
@@ -96,3 +98,4 @@ This is because these tests require changes to the ``config_*.yaml`` files in th
 Be concise as possible.
 Do not modify code that is unrelated to any change.
 Match syntax and formatting of existing code in the same file.
+Preserve the original intent of the code unless otherwise specified.
