@@ -14,7 +14,7 @@ from fabric.api import local  # type: ignore
 from typing import List, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.firesim_topology_elements import FireSimPipeNode, FireSimServerNode
+    from runtools.topology.elements import FireSimPipeNode, FireSimServerNode
     from runtools.runtime_config import RuntimeHWConfig
 
 rootLogger = logging.getLogger()

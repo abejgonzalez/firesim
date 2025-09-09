@@ -3,7 +3,7 @@ from UserToplogies and thus can instantiate your topology. """
 
 from __future__ import annotations
 
-from runtools.firesim_topology_elements import (
+from .elements import (
     FireSimPipeNode,
     FireSimSwitchNode,
     FireSimServerNode,
@@ -11,7 +11,7 @@ from runtools.firesim_topology_elements import (
     FireSimDummyServerNode,
     FireSimNode,
 )
-from runtools.simulation_data_classes import (
+from ..simulation_data_classes import (
     PartitionConfig,
     PartitionMode,
     PartitionNode,
@@ -31,7 +31,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
-    from runtools.firesim_topology_with_passes import FireSimTopologyWithPasses
+    from .core_with_passes import FireSimTopologyWithPasses
 
 
 class UserTopologies:

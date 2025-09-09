@@ -9,16 +9,16 @@ from fabric.contrib.project import rsync_project  # type: ignore
 from fabric.api import run, local, warn_only, get, put, cd, hide  # type: ignore
 from fabric.exceptions import CommandTimeout  # type: ignore
 
-from runtools.switch_model_config import AbstractSwitchToSwitchConfig
-from runtools.pipe_model_config import AbstractPipeToPipeConfig
-from runtools.utils import (
+from ..switch_model_config import AbstractSwitchToSwitchConfig
+from ..pipe_model_config import AbstractPipeToPipeConfig
+from ..utils import (
     get_local_shared_libraries,
     run_only_aws,
     check_script,
     is_on_aws,
     script_path,
 )
-from runtools.simulation_data_classes import (
+from ..simulation_data_classes import (
     PartitionConfig,
     TracerVConfig,
     AutoCounterConfig,
@@ -26,17 +26,17 @@ from runtools.simulation_data_classes import (
     SynthPrintConfig,
 )
 
-from runtools.instance_deploy_managers.instance_deploy_manager import (
+from ..instance_deploy_managers.instance_deploy_manager import (
     InstanceDeployManager,
 )
 from typing import Optional, List, Tuple, Sequence, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.workload import JobConfig
-    from runtools.run_farms.inst import Inst
-    from runtools.runtime_config import RuntimeHWConfig
-    from runtools.utils import MacAddress
-    from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
+    from ..workload import JobConfig
+    from ..run_farms.inst import Inst
+    from ..runtime_config import RuntimeHWConfig
+    from ..utils import MacAddress
+    from ..instance_deploy_managers.ec2 import EC2InstanceDeployManager
 
 rootLogger = logging.getLogger()
 

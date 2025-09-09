@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import abc
 
-from runtools.firesim_topology_elements import (
+from runtools.topology.elements import (
     FireSimPipeNode,
     FireSimSwitchNode,
     FireSimServerNode,

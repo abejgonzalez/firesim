@@ -11,7 +11,7 @@ from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
 
 if TYPE_CHECKING:
     from awstools.awstools import MockBoto3Instance
-    from runtools.firesim_topology_elements import FireSimSwitchNode, FireSimServerNode
+    from runtools.topology.elements import FireSimSwitchNode, FireSimServerNode
     from .inst import Inst
 
 rootLogger = logging.getLogger()

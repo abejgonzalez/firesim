@@ -26,7 +26,7 @@ from awstools.afitools import (
     get_firesim_deploy_quintuplet_for_agfi,
     firesim_description_to_tags,
 )
-from runtools.firesim_topology_with_passes import FireSimTopologyWithPasses
+from runtools.topology.core_with_passes import FireSimTopologyWithPasses
 from runtools.workload import WorkloadConfig
 from runtools.run_farms.run_farm import RunFarm
 

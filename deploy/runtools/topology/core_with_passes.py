@@ -14,16 +14,16 @@ from colorama import Fore, Style  # type: ignore
 from functools import reduce
 from tempfile import TemporaryDirectory
 
-from runtools.firesim_topology_elements import (
+from .elements import (
     FireSimNode,
     FireSimPipeNode,
     FireSimServerNode,
     FireSimDummyServerNode,
     FireSimSwitchNode,
 )
-from runtools.firesim_topology_core import FireSimTopology
-from runtools.utils import MacAddress
-from runtools.simulation_data_classes import (
+from .core import FireSimTopology
+from ..utils import MacAddress
+from ..simulation_data_classes import (
     TracerVConfig,
     AutoCounterConfig,
     HostDebugConfig,
@@ -31,19 +31,19 @@ from runtools.simulation_data_classes import (
     PartitionConfig,
 )
 
-from runtools.instance_deploy_managers.instance_deploy_manager import (
+from ..instance_deploy_managers.instance_deploy_manager import (
     InstanceDeployManager,
 )
 from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from runtools.run_farms.run_farm import RunFarm
-    from runtools.runtime_config import (
+    from ..run_farms.run_farm import RunFarm
+    from ..runtime_config import (
         RuntimeHWDB,
         RuntimeBuildRecipes,
         RuntimeHWConfig,
     )
-    from runtools.workload import WorkloadConfig
+    from ..workload import WorkloadConfig
 
 rootLogger = logging.getLogger()
 

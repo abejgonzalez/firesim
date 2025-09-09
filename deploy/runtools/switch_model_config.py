@@ -13,7 +13,7 @@ from runtools.utils import is_on_aws
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.firesim_topology_elements import FireSimSwitchNode
+    from runtools.topology.elements import FireSimSwitchNode
 
 rootLogger = logging.getLogger()
 
