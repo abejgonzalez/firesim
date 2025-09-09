@@ -37,7 +37,7 @@ from runtools.instance_deploy_managers.instance_deploy_manager import (
 from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:
-    from runtools.run_farm import RunFarm
+    from runtools.run_farms.run_farm import RunFarm
     from runtools.runtime_config import (
         RuntimeHWDB,
         RuntimeBuildRecipes,

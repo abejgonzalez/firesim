@@ -30,7 +30,8 @@ from awstools.afitools import (
 )
 from runtools.firesim_topology_with_passes import FireSimTopologyWithPasses
 from runtools.workload import WorkloadConfig
-from runtools.run_farm import RunFarm
+from runtools.run_farms.run_farm import RunFarm
+
 from runtools.simulation_data_classes import (
     TracerVConfig,
     AutoCounterConfig,

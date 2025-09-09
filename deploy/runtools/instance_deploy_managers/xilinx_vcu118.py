@@ -10,7 +10,7 @@ from runtools.utils import check_script, script_path
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farm import Inst
+    from runtools.run_farms.inst import Inst
 
 
 class XilinxVCU118InstanceDeployManager(InstanceDeployManager):

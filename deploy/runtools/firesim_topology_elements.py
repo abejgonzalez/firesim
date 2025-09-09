@@ -33,7 +33,7 @@ from typing import Optional, List, Dict, Tuple, Sequence, Union, Any, TYPE_CHECK
 
 if TYPE_CHECKING:
     from runtools.workload import JobConfig
-    from runtools.run_farm import Inst
+    from runtools.run_farms.inst import Inst
     from runtools.runtime_config import RuntimeHWConfig
     from runtools.utils import MacAddress
     from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager

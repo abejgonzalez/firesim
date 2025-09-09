@@ -12,7 +12,7 @@ from .nbd_tracker import NBDTracker
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farm import Inst
+    from runtools.run_farms.inst import Inst
 
 rootLogger = logging.getLogger()
 

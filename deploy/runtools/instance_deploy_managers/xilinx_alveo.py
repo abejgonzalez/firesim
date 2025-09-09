@@ -17,7 +17,7 @@ from buildtools.bitbuilder import get_deploy_dir
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farm import Inst
+    from runtools.run_farms.inst import Inst
 
 rootLogger = logging.getLogger()
 

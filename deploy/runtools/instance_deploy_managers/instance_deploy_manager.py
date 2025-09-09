@@ -21,7 +21,7 @@ from .nbd_tracker import NBDTracker
 from typing import List, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farm import Inst
+    from runtools.run_farms.inst import Inst
     from awstools.awstools import MockBoto3Instance
 
 rootLogger = logging.getLogger()
