@@ -9,8 +9,8 @@ from fabric.contrib.project import rsync_project  # type: ignore
 from fabric.api import run, local, warn_only, get, put, cd, hide  # type: ignore
 from fabric.exceptions import CommandTimeout  # type: ignore
 
-from ..switch_model_config import AbstractSwitchToSwitchConfig
-from ..pipe_model_config import AbstractPipeToPipeConfig
+from .switch_model_config import AbstractSwitchToSwitchConfig
+from .pipe_model_config import AbstractPipeToPipeConfig
 from ..utils import (
     get_local_shared_libraries,
     run_only_aws,

@@ -8,12 +8,12 @@ import string
 import logging
 from fabric.api import local  # type: ignore
 
-from runtools.utils import is_on_aws
+from ..utils import is_on_aws
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.topology.elements import FireSimSwitchNode
+    from .elements import FireSimSwitchNode
 
 rootLogger = logging.getLogger()
 
