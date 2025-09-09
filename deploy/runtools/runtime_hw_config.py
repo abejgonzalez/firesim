@@ -25,13 +25,11 @@ from typing import Optional, Dict, Any, List, Sequence, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.utils import MacAddress
-    from runtools.simulation_data_classes import (
-        TracerVConfig,
-        AutoCounterConfig,
-        HostDebugConfig,
-        SynthPrintConfig,
-        PartitionConfig,
-    )
+    from .simulation_configs.tracerv import TracerVConfig
+    from .simulation_configs.autocounter import AutoCounterConfig
+    from .simulation_configs.host_debug import HostDebugConfig
+    from .simulation_configs.synth_print import SynthPrintConfig
+    from .simulation_configs.partition import PartitionConfig
 
 rootLogger = logging.getLogger()
 

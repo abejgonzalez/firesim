@@ -23,13 +23,11 @@ from .elements import (
 )
 from .core import FireSimTopology
 from ..utils import MacAddress
-from ..simulation_data_classes import (
-    TracerVConfig,
-    AutoCounterConfig,
-    HostDebugConfig,
-    SynthPrintConfig,
-    PartitionConfig,
-)
+from ..simulation_configs.tracerv import TracerVConfig
+from ..simulation_configs.autocounter import AutoCounterConfig
+from ..simulation_configs.host_debug import HostDebugConfig
+from ..simulation_configs.synth_print import SynthPrintConfig
+from ..simulation_configs.partition import PartitionConfig
 
 from ..instance_deploy_managers.instance_deploy_manager import InstanceDeployManager
 from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Optional

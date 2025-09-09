@@ -11,7 +11,7 @@ from .elements import (
     FireSimDummyServerNode,
     FireSimNode,
 )
-from ..simulation_data_classes import (
+from ..simulation_configs.partition import (
     PartitionConfig,
     PartitionMode,
     PartitionNode,

@@ -7,13 +7,12 @@ from absl import flags
 from datetime import timedelta
 
 from runtools.run_farms.run_farm import RunFarm
-from runtools.simulation_data_classes import (
-    TracerVConfig,
-    AutoCounterConfig,
-    HostDebugConfig,
-    SynthPrintConfig,
-    PartitionConfig,
-)
+from .simulation_configs.tracerv import TracerVConfig
+from .simulation_configs.autocounter import AutoCounterConfig
+from .simulation_configs.host_debug import HostDebugConfig
+from .simulation_configs.synth_print import SynthPrintConfig
+from .simulation_configs.partition import PartitionConfig
+
 from util.inheritors import inheritors
 from util.deepmerge import deep_merge
 
