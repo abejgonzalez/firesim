@@ -26,9 +26,7 @@ from ..simulation_data_classes import (
     SynthPrintConfig,
 )
 
-from ..instance_deploy_managers.instance_deploy_manager import (
-    InstanceDeployManager,
-)
+from ..instance_deploy_managers.instance_deploy_manager import InstanceDeployManager
 from typing import Optional, List, Tuple, Sequence, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:

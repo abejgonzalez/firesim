@@ -31,9 +31,7 @@ from ..simulation_data_classes import (
     PartitionConfig,
 )
 
-from ..instance_deploy_managers.instance_deploy_manager import (
-    InstanceDeployManager,
-)
+from ..instance_deploy_managers.instance_deploy_manager import InstanceDeployManager
 from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:

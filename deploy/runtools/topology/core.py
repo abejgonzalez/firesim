@@ -5,11 +5,7 @@ topology.
 from __future__ import annotations
 
 from .user_topologies import UserTopologies
-from .elements import (
-    FireSimSwitchNode,
-    FireSimServerNode,
-    FireSimPipeNode,
-)
+from .elements import FireSimSwitchNode, FireSimServerNode, FireSimPipeNode
 
 from typing import List, TYPE_CHECKING
 

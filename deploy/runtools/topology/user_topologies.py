@@ -19,16 +19,7 @@ from ..simulation_data_classes import (
     FireAxeNodeBridgePair,
 )
 
-from typing import (
-    Optional,
-    Union,
-    Callable,
-    Sequence,
-    TYPE_CHECKING,
-    List,
-    Any,
-    Dict,
-)
+from typing import Optional, Union, Callable, Sequence, TYPE_CHECKING, List, Any, Dict
 
 if TYPE_CHECKING:
     from .core_with_passes import FireSimTopologyWithPasses
