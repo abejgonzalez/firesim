@@ -3,7 +3,6 @@ from __future__ import annotations
 from copy import deepcopy
 
 # imports needed for python type checking
-from typing import List
 
 
 # from https://gist.github.com/angstwad/bf22d1822c38a92ec0a9

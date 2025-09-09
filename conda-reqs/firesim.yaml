@@ -118,6 +118,7 @@ dependencies:
     - mypy
     - s3fs==0.4.2
     - aiohttp
+    - autoflake
     - pip
     - pip:
         - sure

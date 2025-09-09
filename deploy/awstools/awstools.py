@@ -18,7 +18,7 @@ from botocore import exceptions
 from fabric.api import local, hide, settings  # type: ignore
 
 # imports needed for python type checking
-from typing import Any, Dict, Optional, List, Sequence, cast
+from typing import Any, Dict, Optional, List, Sequence
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
 from mypy_boto3_ec2.type_defs import FilterTypeDef
 from mypy_boto3_s3.literals import BucketLocationConstraintType

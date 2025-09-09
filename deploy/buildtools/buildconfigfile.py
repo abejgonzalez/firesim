@@ -3,7 +3,6 @@ from __future__ import annotations
 from time import strftime, gmtime
 import pprint
 import logging
-import sys
 import yaml
 from absl import flags
 
@@ -14,7 +13,7 @@ from util.inheritors import inheritors
 from util.deepmerge import deep_merge
 
 # imports needed for python type checking
-from typing import Dict, Optional, List, Set, Type, Any, TYPE_CHECKING
+from typing import List, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from absl.flags import FlagValues

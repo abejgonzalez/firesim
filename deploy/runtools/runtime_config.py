@@ -15,12 +15,10 @@ from fabric.operations import _stdoutString  # type: ignore
 from fabric.api import prefix, settings, local, run  # type: ignore
 from fabric.contrib.project import rsync_project  # type: ignore
 from os.path import join as pjoin
-from os.path import basename, expanduser
+from os.path import expanduser
 from pathlib import Path
-from uuid import uuid1
 from tempfile import TemporaryDirectory
 import hashlib
-import json
 from absl import flags
 
 from awstools.awstools import aws_resource_names
@@ -74,25 +72,11 @@ flags.DEFINE_string(
     "",
     'Override a single value from one of the the RUNTIME e.g.: --overrideconfigdata "target-config link-latency 6405".',
 )
-flags.DEFINE_integer(
-    "terminatesomef116",
-    -1,
-    "DEPRECATED. Use --terminatesome=f1.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.16xlarges.",
-)
-flags.DEFINE_integer(
-    "terminatesomef12",
-    -1,
-    "DEPRECATED. Use --terminatesome=f1.2xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.2xlarges.",
-)
-flags.DEFINE_integer(
-    "terminatesomef14",
-    -1,
-    "DEPRECATED. Use --terminatesome=f1.4xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.4xlarges.",
-)
-flags.DEFINE_integer(
-    "terminatesomem416",
-    -1,
-    "DEPRECATED. Use --terminatesome=m4.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched m4.16xlarges.",
+
+flags.DEFINE_multi_string(
+    "terminatesome",
+    [],
+    "Only used by terminaterunfarm. Used to specify a restriction on how many instances to terminate. E.g., --terminatesome=f1.2xlarge:2 will terminate only 2 of the f1.2xlarge instances in the runfarm, regardless of what other instances are in the runfarm. This argument can be specified multiple times to terminate additional instance types/counts. Behavior when specifying the same instance type multiple times is undefined.",
 )
 
 
@@ -106,13 +90,6 @@ def terminatesomesplitter(raw_arg: str) -> Tuple[str, int]:
     except ValueError as e:
         raise ValueError(f"Count in '{raw_arg}' is not an integer.") from e
     return split_arg[0], count
-
-
-flags.DEFINE_multi_string(
-    "terminatesome",
-    [],
-    "Only used by terminaterunfarm. Used to specify a restriction on how many instances to terminate. E.g., --terminatesome=f1.2xlarge:2 will terminate only 2 of the f1.2xlarge instances in the runfarm, regardless of what other instances are in the runfarm. This argument can be specified multiple times to terminate additional instance types/counts. Behavior when specifying the same instance type multiple times is undefined. This replaces the old --terminatesome{f116,f12,f14,m416} arguments. Behavior when specifying these old-style terminatesome flags and this new style flag at the same time is also undefined.",
-)
 
 
 @flags.validator("terminatesome")
@@ -172,7 +149,7 @@ class URIContainer:
         try:
             # strict=True will throw if the file doesn't exist
             resolved = expanded.resolve(strict=True)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             raise Exception(
                 f"{self.hwcfg_prop} file fallback at path '{uri}' or '{expanded}' was not found"
             )
@@ -218,7 +195,7 @@ class URIContainer:
 
         try:
             downloadURI(uri, destination)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             raise Exception(f"{self.hwcfg_prop} path '{uri}' was not found")
 
         # return, this is not passed to rsync
@@ -759,7 +736,6 @@ class RuntimeHWConfig:
         quintuplet_pieces = self.get_deployquintuplet_pieces_for_config()
         target_project_makefrag = self.get_deploymakefrag_for_config()
 
-        platform = quintuplet_pieces[0]
         target_project = quintuplet_pieces[1]
         design = quintuplet_pieces[2]
         target_config = quintuplet_pieces[3]
@@ -1251,29 +1227,6 @@ class RuntimeConfig:
             for pair in FLAGS.terminatesome:
                 key, val = terminatesomesplitter(pair)
                 terminate_some_dict[key] = val
-
-        def old_style_terminate_args(instance_type, arg_val, arg_flag_str):
-            if arg_val != -1:
-                rootLogger.critical(
-                    "WARNING: You are using the old-style "
-                    + arg_flag_str
-                    + " flag. See the new --terminatesome flag in help. The old-style flag will be removed in the next major FireSim release (1.15.X)."
-                )
-                terminate_some_dict[instance_type] = arg_val
-
-        old_style_terminate_args(
-            "f1.16xlarge", FLAGS.terminatesomef116, "--terminatesomef116"
-        )
-        old_style_terminate_args(
-            "f1.4xlarge", FLAGS.terminatesomef14, "--terminatesomef14"
-        )
-        old_style_terminate_args(
-            "f1.2xlarge", FLAGS.terminatesomef12, "--terminatesomef12"
-        )
-        old_style_terminate_args(
-            "m4.16xlarge", FLAGS.terminatesomem416, "--terminatesomem416"
-        )
-
         self.run_farm.terminate_run_farm(terminate_some_dict, FLAGS.forceterminate)
 
     def infrasetup(self) -> None:

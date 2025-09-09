@@ -29,7 +29,7 @@ from runtools.simulation_data_classes import (
 from runtools.instance_deploy_managers.instance_deploy_manager import (
     InstanceDeployManager,
 )
-from typing import Optional, List, Dict, Tuple, Sequence, Union, Any, TYPE_CHECKING
+from typing import Optional, List, Tuple, Sequence, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.workload import JobConfig
@@ -323,7 +323,7 @@ class FireSimServerNode(FireSimNode):
                 )
                 nbd_tracker = host_inst.instance_deploy_manager.nbd_tracker
                 assert nbd_tracker is not None
-                allocd_device = nbd_tracker.get_nbd_for_imagename(rootfsname)
+                nbd_tracker.get_nbd_for_imagename(rootfsname)
 
     def diagramstr(self) -> str:
         msg = """{}:{}\n----------\nMAC: {}\n{}\n{}""".format(

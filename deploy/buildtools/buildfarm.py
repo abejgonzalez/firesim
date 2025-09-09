@@ -14,7 +14,7 @@ from awstools.awstools import (
 )
 
 # imports needed for python type checking
-from typing import cast, Any, Dict, Optional, Sequence, List, TYPE_CHECKING
+from typing import cast, Any, Dict, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from buildtools.buildconfig import BuildConfig

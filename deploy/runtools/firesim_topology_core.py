@@ -11,7 +11,7 @@ from runtools.firesim_topology_elements import (
     FireSimPipeNode,
 )
 
-from typing import List, Callable, Optional, Union, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.firesim_topology_elements import FireSimNode

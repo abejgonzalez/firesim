@@ -13,7 +13,7 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: 8cc8a5b23744d5e7dd5c8992ccf548cff6bedffa3d933ded58c4e1424f70fd07
+    linux-64: 74cd99f4fbb478704a0ebeb9abce1054342763c93c2bca57499ce492f2fef8ac
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -251,6 +251,20 @@ package:
   hash:
     md5: 61a406051317df9dd63157c4c53899e6
     sha256: 8297a545b15576a899ffc0293a9b25c7d9895e155c61d96f266d38c3c46640cb
+  category: main
+  optional: false
+- name: autoflake
+  version: 2.3.1
+  manager: conda
+  platform: linux-64
+  dependencies:
+    pyflakes: '>=3.0.0'
+    python: '>=3.9'
+    tomli: '>=2.0.1'
+  url: https://conda.anaconda.org/conda-forge/noarch/autoflake-2.3.1-pyhd8ed1ab_0.conda
+  hash:
+    md5: c63112e9aa648a3a0a87b5f490cc5155
+    sha256: 61def0e7849440a2c567a788596038c97f08ba2c907ca99ee62a1036ef5abef3
   category: main
   optional: false
 - name: aws-c-auth
@@ -798,17 +812,17 @@ package:
   category: main
   optional: false
 - name: botocore-stubs
-  version: 1.40.25
+  version: 1.40.26
   manager: conda
   platform: linux-64
   dependencies:
     python: '>=3.10'
     types-awscrt: ''
     typing_extensions: '>=4.1.0'
-  url: https://conda.anaconda.org/conda-forge/noarch/botocore-stubs-1.40.25-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/botocore-stubs-1.40.26-pyhd8ed1ab_0.conda
   hash:
-    md5: addef6045606070a08bb6e45397fa334
-    sha256: 3a5d6709f9648cab5dc5a78ba4d7098e6a91201d2c65ad7386d504e4e702be78
+    md5: 0a02cb4c95f2042a83a75accd18d839d
+    sha256: ee29fba73fb1d3e8105696c9f22c35f50ed6e9046e85914db39f0933d90828e1
   category: main
   optional: false
 - name: brotli
@@ -864,11 +878,11 @@ package:
   platform: linux-64
   dependencies:
     __glibc: '>=2.17,<3.0.a0'
-    libgcc-ng: '>=12'
-  url: https://conda.anaconda.org/conda-forge/linux-64/bzip2-1.0.8-h4bc722e_7.conda
+    libgcc: '>=14'
+  url: https://conda.anaconda.org/conda-forge/linux-64/bzip2-1.0.8-hda65f42_8.conda
   hash:
-    md5: 62ee74e96c5ebb0af99386de58cf9553
-    sha256: 5ced96500d945fb286c9c838e54fa759aa04a7129c59800f0846b4335cee770d
+    md5: 51a19bba1b8ebfb60df25cde030b7ebc
+    sha256: c30daba32ddebbb7ded490f0e371eae90f51e72db620554089103b4a6934b0d5
   category: main
   optional: false
 - name: c-ares
@@ -1765,15 +1779,16 @@ package:
   category: main
   optional: false
 - name: fribidi
-  version: 1.0.10
+  version: 1.0.16
   manager: conda
   platform: linux-64
   dependencies:
-    libgcc-ng: '>=7.5.0'
-  url: https://conda.anaconda.org/conda-forge/linux-64/fribidi-1.0.10-h36c2ea0_0.tar.bz2
+    __glibc: '>=2.17,<3.0.a0'
+    libgcc: '>=14'
+  url: https://conda.anaconda.org/conda-forge/linux-64/fribidi-1.0.16-hb03c661_0.conda
   hash:
-    md5: ac7bc6a654f8f41b352b38f4051135f8
-    sha256: 5d7b6c0ee7743ba41399e9e05a58ccc1cfc903942e49ff6f677f6e423ea7a627
+    md5: f9f81ea472684d75b9dd8d0b328cf655
+    sha256: 858283ff33d4c033f4971bf440cebff217d5552a5222ba994c49be990dacd40d
   category: main
   optional: false
 - name: frozenlist
@@ -4371,10 +4386,10 @@ package:
   dependencies:
     python: '>=3.10,<3.11.0a0'
     python_abi: 3.10.*
-  url: https://conda.anaconda.org/conda-forge/linux-64/portalocker-3.2.0-py310hff52083_0.conda
+  url: https://conda.anaconda.org/conda-forge/linux-64/portalocker-3.2.0-py310hff52083_1.conda
   hash:
-    md5: 385c8a35aee01908b07a021a49386d1a
-    sha256: 840b1eaca87a461f6e96ccd351a28b484c1a01f1ee66ea4fdca295495ea9168e
+    md5: 089bda7d09cd0a36a84f497737d9f043
+    sha256: 905d4ccfbe98e122a9b71be96232cb2bc821d248e828e69acb162aa063246ef9
   category: main
   optional: false
 - name: prompt-toolkit
@@ -4507,6 +4522,18 @@ package:
   hash:
     md5: 6b210a72e9e1b1cb6d30b266b84ca993
     sha256: 8da9aed7f21d775a7c91db6c9f95a0e00cae2d132709d5dc608c2e6828f9344b
+  category: main
+  optional: false
+- name: pyflakes
+  version: 3.4.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    python: '>=3.9'
+  url: https://conda.anaconda.org/conda-forge/noarch/pyflakes-3.4.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: dba204e749e06890aeb3756ef2b1bf35
+    sha256: 4b6fb3f7697b4e591c06149671699777c71ca215e9ec16d5bd0767425e630d65
   category: main
   optional: false
 - name: pygithub
@@ -5724,13 +5751,13 @@ package:
   dependencies:
     __glibc: '>=2.17,<3.0.a0'
     anyio: '>=3.0.0'
-    libgcc: '>=13'
+    libgcc: '>=14'
     python: '>=3.10,<3.11.0a0'
     python_abi: 3.10.*
-  url: https://conda.anaconda.org/conda-forge/linux-64/watchfiles-1.1.0-py310h505e2c1_0.conda
+  url: https://conda.anaconda.org/conda-forge/linux-64/watchfiles-1.1.0-py310hdfeec95_1.conda
   hash:
-    md5: f7eafe8baf641068063dedd29ffc9a44
-    sha256: 3ad0da54ccc60cd42c7ca2a942c7200326a1f387b454c567a1b88079210c6d4e
+    md5: 5147c738aedbf12fca5819800dcc385c
+    sha256: 2179ad1e53727413c2594c338cba8028b32d809fe6f25dafd3bb0b7a5cf07e2f
   category: main
   optional: false
 - name: wcwidth

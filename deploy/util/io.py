@@ -1,8 +1,7 @@
 import logging
-from os import PathLike, fspath
+from os import fspath
 from fsspec.core import url_to_fs, open_local  # type: ignore
 from pathlib import Path
-from typing import Optional
 import time
 
 
@@ -59,7 +58,7 @@ def downloadURI(uri: str, local_dest_path: str, tries: int = 4) -> None:
             fs.get_file(
                 rpath, fspath(lpath)
             )  # fspath() b.c. fsspec deals in strings, not PathLike
-        except Exception as e:
+        except Exception:
             if attempt < tries - 1:
                 time.sleep(1)  # Sleep only after a failure
                 continue

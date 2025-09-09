@@ -34,7 +34,7 @@ from runtools.simulation_data_classes import (
 from runtools.instance_deploy_managers.instance_deploy_manager import (
     InstanceDeployManager,
 )
-from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Callable, Optional
+from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from runtools.run_farms.run_farm import RunFarm

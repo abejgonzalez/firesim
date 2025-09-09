@@ -5,12 +5,10 @@ from __future__ import annotations
 import re
 import logging
 import abc
-import json
 from fabric.api import prefix, local, run, env, cd, warn_only, put, settings, hide  # type: ignore
 from fabric.contrib.project import rsync_project  # type: ignore
 from os.path import join as pjoin
 import os
-from pathlib import Path
 
 from util.streamlogger import StreamLogger
 from awstools.awstools import terminate_instances, get_instance_ids_for_instances
@@ -18,7 +16,7 @@ from runtools.utils import has_sudo, run_only_aws, check_script, is_on_aws, scri
 from buildtools.bitbuilder import get_deploy_dir
 from .nbd_tracker import NBDTracker
 
-from typing import List, Dict, Optional, Union, Tuple, TYPE_CHECKING
+from typing import List, Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.run_farms.inst import Inst

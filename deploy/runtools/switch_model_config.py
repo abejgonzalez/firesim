@@ -3,7 +3,6 @@ models that live in target-design/switch/ """
 
 from __future__ import annotations
 
-import subprocess
 import random
 import string
 import logging
@@ -42,7 +41,6 @@ class AbstractSwitchToSwitchConfig:
         """Emit an init for a switch to talk to it's uplink."""
 
         linkobj = self.fsimswitchnode.uplinks[uplinkno]
-        upperswitch = linkobj.get_uplink_side()
 
         target_local_portno = len(self.fsimswitchnode.downlinks) + uplinkno
         if linkobj.link_crosses_hosts():
@@ -74,7 +72,6 @@ class AbstractSwitchToSwitchConfig:
     def emit_init_for_downlink(self, downlinkno: int) -> str:
         """emit an init for the specified downlink."""
         downlinkobj = self.fsimswitchnode.downlinks[downlinkno]
-        downlink = downlinkobj.get_downlink_side()
         if downlinkobj.link_crosses_hosts():
             hostport = downlinkobj.link_hostserver_port()
             # create a SocketServerPort

@@ -24,7 +24,6 @@ with warnings.catch_warnings():
 
 import string
 from inspect import signature
-from warnings import warn
 from pathlib import Path
 
 from runtools.runtime_config import RuntimeConfig
@@ -39,7 +38,7 @@ from util.streamlogger import StreamLogger, InfoStreamLogger
 from util.filelineswap import file_line_swap
 from util.io import firesim_input
 
-from typing import Dict, Callable, Type, Optional, TypedDict, get_type_hints, Tuple, List
+from typing import Dict, Callable, Optional, TypedDict, get_type_hints, Tuple, List
 
 FLAGS = flags.FLAGS
 PLATFORM_LIST = [_.name for _ in Path(__file__).parent.parent.joinpath('platforms').iterdir()]

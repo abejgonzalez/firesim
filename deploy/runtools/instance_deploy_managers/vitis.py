@@ -67,7 +67,6 @@ class VitisInstanceDeployManager(InstanceDeployManager):
                 bitstream_tar = hwcfg.get_bitstream_tar_filename()
                 remote_sim_dir = self.get_remote_sim_dir_for_slot(slotno)
                 bitstream_tar_unpack_dir = f"{remote_sim_dir}/{self.PLATFORM_NAME}"
-                bit = f"{remote_sim_dir}/{self.PLATFORM_NAME}/firesim.xclbin"
 
                 # at this point the tar file is in the sim slot
                 run(f"rm -rf {bitstream_tar_unpack_dir}")
@@ -104,13 +103,11 @@ class VitisInstanceDeployManager(InstanceDeployManager):
             self.instance_logger(
                 f"""Starting {self.sim_type_message} simulation for slot: {slotno}."""
             )
-            remote_home_dir = self.parent_node.sim_dir
             remote_sim_dir = self.get_remote_sim_dir_for_slot(slotno)
             assert slotno < len(
                 self.parent_node.sim_slots
             ), f"{slotno} can not index into sim_slots {len(self.parent_node.sim_slots)} on {self.parent_node.host}"
             server = self.parent_node.sim_slots[slotno]
-            hwcfg = server.get_resolved_server_hardware_config()
 
             bit = f"{remote_sim_dir}/{self.PLATFORM_NAME}/firesim.xclbin"
 

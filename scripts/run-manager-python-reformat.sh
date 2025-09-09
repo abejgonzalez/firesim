@@ -22,5 +22,12 @@ done
 
 set -ex
 
+autoflake $CHECK_FLAG \
+    --ignore-pass-after-docstring \
+    --remove-duplicate-keys \
+    --remove-unused-variables \
+    -i \
+    -r \
+    $FSIM_DIR/deploy
 black $CHECK_FLAG \
     $FSIM_DIR/deploy

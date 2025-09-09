@@ -11,7 +11,7 @@ import os
 from numpy import partition
 from fabric.api import local  # type: ignore
 
-from typing import List, Set, Dict, TYPE_CHECKING
+from typing import List, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.firesim_topology_elements import FireSimPipeNode, FireSimServerNode

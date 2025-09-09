@@ -3,10 +3,8 @@ from enum import Enum, auto
 import sys
 import logging
 
-from time import strftime, gmtime
 import pprint
 import yaml
-from pathlib import Path
 
 from awstools.awstools import valid_aws_configure_creds, aws_resource_names
 from buildtools.bitbuilder import BitBuilder
@@ -15,7 +13,7 @@ from util.deepmerge import deep_merge
 from util.targetprojectutils import extra_target_project_make_args, resolve_path
 
 # imports needed for python type checking
-from typing import Set, Any, Optional, Dict, TYPE_CHECKING
+from typing import Any, Optional, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from buildtools.buildconfigfile import BuildConfigFile

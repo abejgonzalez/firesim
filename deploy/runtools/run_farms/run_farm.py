@@ -3,11 +3,10 @@ from __future__ import annotations
 import logging
 import abc
 import os
-from collections import defaultdict
 
 from util.inheritors import inheritors
 
-from typing import Any, Dict, Optional, List, Union, Type, Tuple, TYPE_CHECKING
+from typing import Any, Dict, Optional, List, Union, Tuple, TYPE_CHECKING
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
 
 if TYPE_CHECKING:
