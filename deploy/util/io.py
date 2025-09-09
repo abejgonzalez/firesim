@@ -2,7 +2,6 @@ import logging
 from os import PathLike, fspath
 from fsspec.core import url_to_fs, open_local  # type: ignore
 from pathlib import Path
-from fabric.api import local  # type: ignore
 from typing import Optional
 import time
 

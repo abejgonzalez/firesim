@@ -108,10 +108,9 @@ else
         # auto-gen the lockfile
         ./scripts/generate-conda-lockfile.sh
     fi
-    LOCKFILE="$(find $FDIR/conda-reqs/*.conda-lock.yml)"
 
     # create environment with conda-lock
-    conda-lock install --conda $(which conda) -p $FDIR/.conda-env $LOCKFILE
+    ./scripts/install-conda-lockfile.sh
 
     # activate environment for downstream steps
     source $FDIR/.conda-env/etc/profile.d/conda.sh
