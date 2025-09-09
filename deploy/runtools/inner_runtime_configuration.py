@@ -6,7 +6,7 @@ import pprint
 from absl import flags
 from datetime import timedelta
 
-from runtools.run_farms.run_farm import RunFarm
+from runtools.run_farm import RunFarm
 from .simulation_configs.tracerv import TracerVConfig
 from .simulation_configs.autocounter import AutoCounterConfig
 from .simulation_configs.host_debug import HostDebugConfig

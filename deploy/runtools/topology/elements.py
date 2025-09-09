@@ -25,12 +25,12 @@ from ..simulation_configs.synth_print import SynthPrintConfig
 from ..simulation_configs.partition import PartitionConfig
 
 
-from ..instance_deploy_managers.instance_deploy_manager import InstanceDeployManager
+from ..instance_deploy_manager import InstanceDeployManager
 from typing import Optional, List, Tuple, Sequence, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..workload import JobConfig
-    from ..run_farms.inst import Inst
+    from ..run_farm import RunHost
     from ..runtime_hw_config import RuntimeHWConfig
     from ..utils import MacAddress
     from ..instance_deploy_managers.ec2 import EC2InstanceDeployManager
@@ -140,7 +140,7 @@ class FireSimNode(metaclass=abc.ABCMeta):
     downlinks: List[FireSimLink]
     downlinkmacs: List[MacAddress]
     uplinks: List[FireSimLink]
-    host_instance: Optional[Inst]
+    host_instance: Optional[RunHost]
 
     def __init__(self) -> None:
         self.downlinks = []
@@ -177,10 +177,10 @@ class FireSimNode(metaclass=abc.ABCMeta):
     def has_assigned_host_instance(self) -> bool:
         return self.host_instance is not None
 
-    def assign_host_instance(self, host_instance_run_farm_object: Inst) -> None:
+    def assign_host_instance(self, host_instance_run_farm_object: RunHost) -> None:
         self.host_instance = host_instance_run_farm_object
 
-    def get_host_instance(self) -> Inst:
+    def get_host_instance(self) -> RunHost:
         assert self.host_instance is not None
         return self.host_instance
 

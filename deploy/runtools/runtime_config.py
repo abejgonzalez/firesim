@@ -9,9 +9,9 @@ from time import strftime, gmtime
 
 from typing import Tuple, List
 
-from .runtime_hw_db import RuntimeHWDB
+from .runtime_hwdb import RuntimeHWDB
 from .inner_runtime_configuration import InnerRuntimeConfiguration
-from .run_farms.run_farm import RunFarm
+from .run_farm import RunFarm
 from .workload import WorkloadConfig
 from .topology.core_with_passes import FireSimTopologyWithPasses
 from .runtime_build_recipes import RuntimeBuildRecipes

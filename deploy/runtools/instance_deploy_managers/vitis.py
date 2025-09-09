@@ -6,12 +6,12 @@ import logging
 import json
 from fabric.api import run, cd, settings, hide, put  # type: ignore
 
-from .instance_deploy_manager import InstanceDeployManager
+from ..instance_deploy_manager import InstanceDeployManager
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farms.inst import Inst
+    from runtools.run_farm import RunHost
 
 
 rootLogger = logging.getLogger()
@@ -22,7 +22,7 @@ class VitisInstanceDeployManager(InstanceDeployManager):
 
     PLATFORM_NAME: str = "vitis"
 
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
 
     def clear_fpgas(self) -> None:

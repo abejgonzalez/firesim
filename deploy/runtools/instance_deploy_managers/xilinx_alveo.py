@@ -10,14 +10,14 @@ from pathlib import Path
 from fabric.api import run, cd, put  # type: ignore
 from fabric.contrib.project import rsync_project  # type: ignore
 
-from .instance_deploy_manager import InstanceDeployManager
+from ..instance_deploy_manager import InstanceDeployManager
 from runtools.utils import check_script, script_path
 from buildtools.utils import get_deploy_dir
 
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farms.inst import Inst
+    from runtools.run_farm import RunHost
 
 rootLogger = logging.getLogger()
 
@@ -27,7 +27,7 @@ class XilinxAlveoInstanceDeployManager(InstanceDeployManager):
 
     PLATFORM_NAME: Optional[str]
 
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
         self.PLATFORM_NAME = None
 
@@ -304,24 +304,24 @@ class XilinxAlveoInstanceDeployManager(InstanceDeployManager):
 
 
 class XilinxAlveoU250InstanceDeployManager(XilinxAlveoInstanceDeployManager):
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
         self.PLATFORM_NAME = "xilinx_alveo_u250"
 
 
 class XilinxAlveoU280InstanceDeployManager(XilinxAlveoInstanceDeployManager):
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
         self.PLATFORM_NAME = "xilinx_alveo_u280"
 
 
 class XilinxAlveoU200InstanceDeployManager(XilinxAlveoInstanceDeployManager):
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
         self.PLATFORM_NAME = "xilinx_alveo_u200"
 
 
 class RHSResearchNitefuryIIInstanceDeployManager(XilinxAlveoInstanceDeployManager):
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
         self.PLATFORM_NAME = "rhsresearch_nitefury_ii"

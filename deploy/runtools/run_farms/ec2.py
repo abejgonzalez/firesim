@@ -21,12 +21,9 @@ from awstools.awstools import (
 )
 from util.inheritors import inheritors
 from util.io import firesim_input
-from runtools.instance_deploy_managers.instance_deploy_manager import (
-    InstanceDeployManager,
-)
+from runtools.instance_deploy_manager import InstanceDeployManager
 from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
-from .run_farm import RunFarm
-from .inst import Inst
+from ..run_farm import RunFarm, RunHost
 
 from typing import Any, Dict, Optional, List, Union, Tuple, TYPE_CHECKING
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
@@ -151,12 +148,12 @@ class AWSEC2F1(RunFarm):
             )
 
             insts: List[
-                Tuple[Inst, Optional[Union[EC2InstanceResource, MockBoto3Instance]]]
+                Tuple[RunHost, Optional[Union[EC2InstanceResource, MockBoto3Instance]]]
             ] = []
             for _ in range(num_insts):
                 insts.append(
                     (
-                        Inst(
+                        RunHost(
                             self,
                             num_sim_slots,
                             dispatch_dict[platform],
@@ -336,7 +333,7 @@ class AWSEC2F1(RunFarm):
         else:
             rootLogger.critical("Termination cancelled.")
 
-    def get_all_host_nodes(self) -> List[Inst]:
+    def get_all_host_nodes(self) -> List[RunHost]:
         all_insts = []
         for sim_host_handle in sorted(self.SIM_HOST_HANDLE_TO_MAX_FPGA_SLOTS):
             inst_list = self.run_farm_hosts_dict[sim_host_handle]
@@ -344,7 +341,7 @@ class AWSEC2F1(RunFarm):
                 all_insts.append(inst)
         return all_insts
 
-    def get_all_bound_host_nodes(self) -> List[Inst]:
+    def get_all_bound_host_nodes(self) -> List[RunHost]:
         all_insts = []
         for sim_host_handle in sorted(self.SIM_HOST_HANDLE_TO_MAX_FPGA_SLOTS):
             inst_list = self.run_farm_hosts_dict[sim_host_handle]
@@ -353,13 +350,13 @@ class AWSEC2F1(RunFarm):
                     all_insts.append(inst)
         return all_insts
 
-    def lookup_by_host(self, host) -> Inst:
+    def lookup_by_host(self, host) -> RunHost:
         for host_node in self.get_all_bound_host_nodes():
             if host_node.get_host() == host:
                 return host_node
         assert False, f"Unable to find host node by {host}"
 
-    def terminate_by_inst(self, inst: Inst) -> None:
+    def terminate_by_inst(self, inst: RunHost) -> None:
         """Terminate run farm host based on host."""
         for sim_host_handle in sorted(self.SIM_HOST_HANDLE_TO_MAX_FPGA_SLOTS):
             inst_list = self.run_farm_hosts_dict[sim_host_handle]

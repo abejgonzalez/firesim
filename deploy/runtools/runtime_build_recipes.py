@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import yaml
 
-from .runtime_hw_db import RuntimeHWDB
+from .runtime_hwdb import RuntimeHWDB
 from .runtime_build_recipe_config import RuntimeBuildRecipeConfig
 
 

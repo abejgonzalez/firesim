@@ -5,11 +5,8 @@ import pprint
 from collections import defaultdict
 
 from util.inheritors import inheritors
-from runtools.instance_deploy_managers.instance_deploy_manager import (
-    InstanceDeployManager,
-)
-from .run_farm import RunFarm
-from .inst import Inst
+from runtools.instance_deploy_manager import InstanceDeployManager
+from ..run_farm import RunFarm, RunHost
 
 from typing import Any, Dict, List, TYPE_CHECKING
 
@@ -88,7 +85,7 @@ class ExternallyProvisioned(RunFarm):
             )
             fpga_db = host_spec.get("override_fpga_db", default_fpga_db)
 
-            inst = Inst(
+            inst = RunHost(
                 self,
                 num_sims,
                 dispatch_dict[platform],
@@ -120,7 +117,7 @@ class ExternallyProvisioned(RunFarm):
         )
         return
 
-    def get_all_host_nodes(self) -> List[Inst]:
+    def get_all_host_nodes(self) -> List[RunHost]:
         all_insts = []
         for sim_host_handle in sorted(self.SIM_HOST_HANDLE_TO_MAX_FPGA_SLOTS):
             inst_list = self.run_farm_hosts_dict[sim_host_handle]
@@ -128,16 +125,16 @@ class ExternallyProvisioned(RunFarm):
                 all_insts.append(inst)
         return all_insts
 
-    def get_all_bound_host_nodes(self) -> List[Inst]:
+    def get_all_bound_host_nodes(self) -> List[RunHost]:
         return self.get_all_host_nodes()
 
-    def lookup_by_host(self, host: str) -> Inst:
+    def lookup_by_host(self, host: str) -> RunHost:
         for host_node in self.get_all_bound_host_nodes():
             if host_node.get_host() == host:
                 return host_node
         assert False, f"Unable to find host node by {host} host name"
 
-    def terminate_by_inst(self, inst: Inst) -> None:
+    def terminate_by_inst(self, inst: RunHost) -> None:
         rootLogger.info(
             f"WARNING: Skipping terminate_by_inst since run hosts are externally provisioned."
         )

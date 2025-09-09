@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from fabric.api import run, cd, put  # type: ignore
 
-from .instance_deploy_manager import InstanceDeployManager
+from ..instance_deploy_manager import InstanceDeployManager
 from runtools.utils import check_script, script_path
 
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farms.inst import Inst
+    from runtools.run_farm import RunHost
 
 
 class XilinxVCU118InstanceDeployManager(InstanceDeployManager):
@@ -19,7 +19,7 @@ class XilinxVCU118InstanceDeployManager(InstanceDeployManager):
 
     PLATFORM_NAME: Optional[str]
 
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
         self.PLATFORM_NAME = "xilinx_vcu118"
 

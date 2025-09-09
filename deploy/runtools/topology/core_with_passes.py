@@ -29,12 +29,12 @@ from ..simulation_configs.host_debug import HostDebugConfig
 from ..simulation_configs.synth_print import SynthPrintConfig
 from ..simulation_configs.partition import PartitionConfig
 
-from ..instance_deploy_managers.instance_deploy_manager import InstanceDeployManager
+from ..instance_deploy_manager import InstanceDeployManager
 from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from ..run_farms.run_farm import RunFarm
-    from ..runtime_hw_db import RuntimeHWDB
+    from ..run_farm import RunFarm
+    from ..runtime_hwdb import RuntimeHWDB
     from ..runtime_build_recipes import RuntimeBuildRecipes
     from ..runtime_hw_config import RuntimeHWConfig
     from ..workload import WorkloadConfig

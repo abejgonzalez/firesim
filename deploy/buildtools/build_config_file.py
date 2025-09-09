@@ -7,7 +7,7 @@ import yaml
 from absl import flags
 
 from util.inheritors import inheritors
-from runtools.runtime_hw_db import RuntimeHWDB
+from runtools.runtime_hwdb import RuntimeHWDB
 from buildtools.build_config import BuildConfig
 from buildtools.build_farm import BuildFarm
 from buildtools.build_farms.externally_provisioned import ExternallyProvisioned

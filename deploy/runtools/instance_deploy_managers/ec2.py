@@ -6,13 +6,13 @@ import logging
 from fabric.api import prefix, local, run, cd, warn_only, put, settings  # type: ignore
 import os
 
-from .instance_deploy_manager import InstanceDeployManager
-from .nbd_tracker import NBDTracker
+from ..instance_deploy_manager import InstanceDeployManager
+from ..nbd_tracker import NBDTracker
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farms.inst import Inst
+    from runtools.run_farm import RunHost
 
 rootLogger = logging.getLogger()
 
@@ -24,7 +24,7 @@ class EC2InstanceDeployManager(InstanceDeployManager):
     This is in charge of managing the locations of stuff on remote nodes.
     """
 
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         super().__init__(parent_node)
         self.nbd_tracker = NBDTracker()
 

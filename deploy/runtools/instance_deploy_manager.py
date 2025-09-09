@@ -19,7 +19,7 @@ from .nbd_tracker import NBDTracker
 from typing import List, Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from runtools.run_farms.inst import Inst
+    from runtools.run_farm import RunHost
     from awstools.awstools import MockBoto3Instance
 
 rootLogger = logging.getLogger()
@@ -32,10 +32,10 @@ class InstanceDeployManager(metaclass=abc.ABCMeta):
         parent_node: Run farm host associated with this platform implementation.
     """
 
-    parent_node: Inst
+    parent_node: RunHost
     nbd_tracker: Optional[NBDTracker]
 
-    def __init__(self, parent_node: Inst) -> None:
+    def __init__(self, parent_node: RunHost) -> None:
         """
         Args:
             parent_node: Run farm host to associate with this platform implementation
