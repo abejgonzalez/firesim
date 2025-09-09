@@ -36,11 +36,9 @@ from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from ..run_farms.run_farm import RunFarm
-    from ..runtime_config import (
-        RuntimeHWDB,
-        RuntimeBuildRecipes,
-        RuntimeHWConfig,
-    )
+    from ..runtime_hw_db import RuntimeHWDB
+    from ..runtime_build_recipes import RuntimeBuildRecipes
+    from ..runtime_hw_config import RuntimeHWConfig
     from ..workload import WorkloadConfig
 
 rootLogger = logging.getLogger()

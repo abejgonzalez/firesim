@@ -6,7 +6,7 @@ import logging
 import yaml
 from absl import flags
 
-from runtools.runtime_config import RuntimeHWDB
+from runtools.runtime_hw_db import RuntimeHWDB
 from buildtools.buildconfig import BuildConfig
 from buildtools.buildfarm import BuildFarm
 from util.inheritors import inheritors

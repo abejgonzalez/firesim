@@ -32,7 +32,7 @@ from typing import Optional, List, Tuple, Sequence, Union, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from ..workload import JobConfig
     from ..run_farms.inst import Inst
-    from ..runtime_config import RuntimeHWConfig
+    from ..runtime_hw_config import RuntimeHWConfig
     from ..utils import MacAddress
     from ..instance_deploy_managers.ec2 import EC2InstanceDeployManager
 

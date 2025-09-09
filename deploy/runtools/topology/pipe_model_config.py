@@ -15,7 +15,7 @@ from typing import List, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .elements import FireSimPipeNode, FireSimServerNode
-    from ..runtime_config import RuntimeHWConfig
+    from ..runtime_hw_config import RuntimeHWConfig
 
 rootLogger = logging.getLogger()
 
