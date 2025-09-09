@@ -13,7 +13,7 @@ import hashlib
 from tempfile import TemporaryDirectory
 
 from awstools.awstools import get_localhost_instance_id
-from buildtools.bitbuilder import get_deploy_dir
+from buildtools.utils import get_deploy_dir
 
 from typing import List, Tuple, Type, Optional
 

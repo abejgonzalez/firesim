@@ -6,6 +6,7 @@ import logging
 import pprint
 import yaml
 
+from util.inheritors import inheritors
 from awstools.awstools import valid_aws_configure_creds, aws_resource_names
 from buildtools.bitbuilder import BitBuilder
 import buildtools
@@ -16,7 +17,7 @@ from util.targetprojectutils import extra_target_project_make_args, resolve_path
 from typing import Any, Optional, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from buildtools.buildconfigfile import BuildConfigFile
+    from buildtools.build_config_file import BuildConfigFile
 
 rootLogger = logging.getLogger()
 
@@ -167,7 +168,7 @@ class BuildConfig:
             bitbuilder_args = deep_merge(bitbuilder_args, override_args)
 
         bitbuilder_dispatch_dict = dict(
-            [(x.__name__, x) for x in buildtools.buildconfigfile.inheritors(BitBuilder)]
+            [(x.__name__, x) for x in inheritors(BitBuilder)]
         )
 
         if not bitbuilder_type_name in bitbuilder_dispatch_dict:

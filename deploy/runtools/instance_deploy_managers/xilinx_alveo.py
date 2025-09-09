@@ -12,7 +12,7 @@ from fabric.contrib.project import rsync_project  # type: ignore
 
 from .instance_deploy_manager import InstanceDeployManager
 from runtools.utils import check_script, script_path
-from buildtools.bitbuilder import get_deploy_dir
+from buildtools.utils import get_deploy_dir
 
 from typing import Optional, TYPE_CHECKING
 

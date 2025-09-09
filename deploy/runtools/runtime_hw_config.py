@@ -16,7 +16,7 @@ from awstools.afitools import (
 )
 from runtools.utils import is_on_aws
 from util.targetprojectutils import extra_target_project_make_args, resolve_path
-from buildtools.bitbuilder import get_deploy_dir
+from buildtools.utils import get_deploy_dir
 from util.streamlogger import InfoStreamLogger
 from util.export import create_export_string
 from .uri_container import URIContainer

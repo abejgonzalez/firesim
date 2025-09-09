@@ -13,7 +13,7 @@ import os
 from util.streamlogger import StreamLogger
 from awstools.awstools import terminate_instances, get_instance_ids_for_instances
 from runtools.utils import has_sudo, run_only_aws, check_script, is_on_aws, script_path
-from buildtools.bitbuilder import get_deploy_dir
+from buildtools.utils import get_deploy_dir
 from .nbd_tracker import NBDTracker
 
 from typing import List, Dict, Optional, TYPE_CHECKING
