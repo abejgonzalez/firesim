@@ -31,7 +31,9 @@ from runtools.simulation_data_classes import (
     PartitionConfig,
 )
 
-from runtools.run_farm_deploy_managers import InstanceDeployManager
+from runtools.instance_deploy_managers.instance_deploy_manager import (
+    InstanceDeployManager,
+)
 from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:

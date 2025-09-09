@@ -117,7 +117,7 @@ class WorkloadConfig:
     derive_rootfs: bool
     common_bootbinary: str
     workload_name: str
-    common_outputs: str
+    common_outputs: List[str]
     common_simulation_outputs: List[str]
     common_simulation_inputs: List[str]
     workload_input_base_dir: str
@@ -127,7 +127,9 @@ class WorkloadConfig:
     job_results_dir: str
     job_monitoring_dir: str
 
-    def __init__(self, workloadfilename: str, launch_time: str, suffixtag: str) -> None:
+    def __init__(
+        self, workloadfilename: str, launch_time: str, suffixtag: Optional[str]
+    ) -> None:
         self.workloadfilename = self.workloadinputs + workloadfilename
         workloadjson = None
         with open(self.workloadfilename) as json_data:

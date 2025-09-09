@@ -29,7 +29,6 @@ from awstools.afitools import (
     firesim_description_to_tags,
 )
 from runtools.firesim_topology_with_passes import FireSimTopologyWithPasses
-from runtools.run_farm_deploy_managers import VitisInstanceDeployManager
 from runtools.workload import WorkloadConfig
 from runtools.run_farm import RunFarm
 from runtools.simulation_data_classes import (
@@ -49,6 +48,7 @@ from buildtools.bitbuilder import get_deploy_dir
 from util.io import downloadURI
 
 from typing import Optional, Dict, Any, List, Sequence, Tuple, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from runtools.utils import MacAddress
 
@@ -60,13 +60,40 @@ rootLogger = logging.getLogger()
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('runtimeconfigfile', 'config_runtime.yaml', 'Optional custom runtime/workload config file.')
-flags.DEFINE_string('hwdbconfigfile', 'config_hwdb.yaml', 'Optional custom HW database config file.')
-flags.DEFINE_string('overrideconfigdata', "", 'Override a single value from one of the the RUNTIME e.g.: --overrideconfigdata "target-config link-latency 6405".')
-flags.DEFINE_integer('terminatesomef116', -1, 'DEPRECATED. Use --terminatesome=f1.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.16xlarges.')
-flags.DEFINE_integer('terminatesomef12', -1, 'DEPRECATED. Use --terminatesome=f1.2xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.2xlarges.')
-flags.DEFINE_integer('terminatesomef14', -1, 'DEPRECATED. Use --terminatesome=f1.4xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.4xlarges.')
-flags.DEFINE_integer('terminatesomem416', -1, 'DEPRECATED. Use --terminatesome=m4.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched m4.16xlarges.')
+flags.DEFINE_string(
+    "runtimeconfigfile",
+    "config_runtime.yaml",
+    "Optional custom runtime/workload config file.",
+)
+flags.DEFINE_string(
+    "hwdbconfigfile", "config_hwdb.yaml", "Optional custom HW database config file."
+)
+flags.DEFINE_string(
+    "overrideconfigdata",
+    "",
+    'Override a single value from one of the the RUNTIME e.g.: --overrideconfigdata "target-config link-latency 6405".',
+)
+flags.DEFINE_integer(
+    "terminatesomef116",
+    -1,
+    "DEPRECATED. Use --terminatesome=f1.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.16xlarges.",
+)
+flags.DEFINE_integer(
+    "terminatesomef12",
+    -1,
+    "DEPRECATED. Use --terminatesome=f1.2xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.2xlarges.",
+)
+flags.DEFINE_integer(
+    "terminatesomef14",
+    -1,
+    "DEPRECATED. Use --terminatesome=f1.4xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched f1.4xlarges.",
+)
+flags.DEFINE_integer(
+    "terminatesomem416",
+    -1,
+    "DEPRECATED. Use --terminatesome=m4.16xlarge:count instead. Will be removed in the next major version of FireSim (1.15.X). Old help message: Only used by terminaterunfarm. Terminates this many of the previously launched m4.16xlarges.",
+)
+
 
 def terminatesomesplitter(raw_arg: str) -> Tuple[str, int]:
     """Splits a string of form 'instance_type:count' into a tuple."""
@@ -79,16 +106,26 @@ def terminatesomesplitter(raw_arg: str) -> Tuple[str, int]:
         raise ValueError(f"Count in '{raw_arg}' is not an integer.") from e
     return split_arg[0], count
 
-flags.DEFINE_multi_string('terminatesome', [], 'Only used by terminaterunfarm. Used to specify a restriction on how many instances to terminate. E.g., --terminatesome=f1.2xlarge:2 will terminate only 2 of the f1.2xlarge instances in the runfarm, regardless of what other instances are in the runfarm. This argument can be specified multiple times to terminate additional instance types/counts. Behavior when specifying the same instance type multiple times is undefined. This replaces the old --terminatesome{f116,f12,f14,m416} arguments. Behavior when specifying these old-style terminatesome flags and this new style flag at the same time is also undefined.')
-@flags.validator('terminatesome')
+
+flags.DEFINE_multi_string(
+    "terminatesome",
+    [],
+    "Only used by terminaterunfarm. Used to specify a restriction on how many instances to terminate. E.g., --terminatesome=f1.2xlarge:2 will terminate only 2 of the f1.2xlarge instances in the runfarm, regardless of what other instances are in the runfarm. This argument can be specified multiple times to terminate additional instance types/counts. Behavior when specifying the same instance type multiple times is undefined. This replaces the old --terminatesome{f116,f12,f14,m416} arguments. Behavior when specifying these old-style terminatesome flags and this new style flag at the same time is also undefined.",
+)
+
+
+@flags.validator("terminatesome")
 def _check_terminatesome(terminatesome_list: List[str]) -> bool:
     """Ensures --terminatesome flags are formatted correctly."""
     for terminatesome_arg in terminatesome_list:
         try:
             terminatesomesplitter(terminatesome_arg)
         except ValueError as e:
-            raise flags.ValidationError(f"Invalid --terminatesome value: '{terminatesome_arg}'. {e}")
+            raise flags.ValidationError(
+                f"Invalid --terminatesome value: '{terminatesome_arg}'. {e}"
+            )
     return True
+
 
 # from  https://github.com/pandas-dev/pandas/blob/96b036cbcf7db5d3ba875aac28c4f6a678214bfb/pandas/io/common.py#L73
 _RFC_3986_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+\-+.]*://")
@@ -1026,7 +1063,7 @@ class InnerRuntimeConfiguration:
     synthprint_config: SynthPrintConfig
     partition_config: PartitionConfig
     workload_name: str
-    suffixtag: str
+    suffixtag: Optional[str]
     terminateoncompletion: bool
     metasimulation_enabled: bool
     metasimulation_host_simulator: str

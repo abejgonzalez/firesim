@@ -26,10 +26,10 @@ from awstools.awstools import (
 from runtools.firesim_topology_elements import FireSimPipeNode
 from util.inheritors import inheritors
 from util.io import firesim_input
-from runtools.run_farm_deploy_managers import (
+from runtools.instance_deploy_managers.instance_deploy_manager import (
     InstanceDeployManager,
-    EC2InstanceDeployManager,
 )
+from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
 
 from typing import Any, Dict, Optional, List, Union, Set, Type, Tuple, TYPE_CHECKING
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource

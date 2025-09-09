@@ -15,6 +15,7 @@ from util.deepmerge import deep_merge
 
 # imports needed for python type checking
 from typing import Dict, Optional, List, Set, Type, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from absl.flags import FlagValues
 
@@ -22,11 +23,29 @@ rootLogger = logging.getLogger()
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('buildconfigfile', 'config_build.yaml', 'Optional custom build config file.')
-flags.DEFINE_string('buildrecipesconfigfile', 'config_build_recipes.yaml', 'Optional custom build recipe config file.')
-flags.DEFINE_string('buildfarmconfigfile', 'config_build_farm.yaml', 'Optional custom build farm config file.')
-flags.DEFINE_string('launchtime', None, 'Give the "Y-m-d--H-M-S" prefix of results-build directory. Useful for tar2afi when finishing a partial buildafi')
-flags.DEFINE_boolean('forceterminate', False, 'For terminaterunfarm and buildbitstream, force termination without prompting user for confirmation.')
+flags.DEFINE_string(
+    "buildconfigfile", "config_build.yaml", "Optional custom build config file."
+)
+flags.DEFINE_string(
+    "buildrecipesconfigfile",
+    "config_build_recipes.yaml",
+    "Optional custom build recipe config file.",
+)
+flags.DEFINE_string(
+    "buildfarmconfigfile",
+    "config_build_farm.yaml",
+    "Optional custom build farm config file.",
+)
+flags.DEFINE_string(
+    "launchtime",
+    None,
+    'Give the "Y-m-d--H-M-S" prefix of results-build directory. Useful for tar2afi when finishing a partial buildafi',
+)
+flags.DEFINE_boolean(
+    "forceterminate",
+    False,
+    "For terminaterunfarm and buildbitstream, force termination without prompting user for confirmation.",
+)
 
 
 class BuildConfigFile:

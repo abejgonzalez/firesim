@@ -26,7 +26,9 @@ from runtools.simulation_data_classes import (
     SynthPrintConfig,
 )
 
-from runtools.run_farm_deploy_managers import InstanceDeployManager
+from runtools.instance_deploy_managers.instance_deploy_manager import (
+    InstanceDeployManager,
+)
 from typing import Optional, List, Dict, Tuple, Sequence, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -34,7 +36,7 @@ if TYPE_CHECKING:
     from runtools.run_farm import Inst
     from runtools.runtime_config import RuntimeHWConfig
     from runtools.utils import MacAddress
-    from runtools.run_farm_deploy_managers import EC2InstanceDeployManager
+    from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
 
 rootLogger = logging.getLogger()
 
