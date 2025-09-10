@@ -11,7 +11,7 @@ options:
   -h, --help            show this help message and exit
   --helpfull            show full help message and exit
   --platform PLATFORM   <xilinx_alveo_u250|xilinx_alveo_u200|rhsresearch_nitef
-                        ury_ii|xilinx_alveo_u280|vitis|xilinx_vcu118|f1>:
+                        ury_ii|xilinx_alveo_u280|xilinx_vcu118|f1>:
                         Required argument for "managerinit" to specify which
                         platform you will be using
 

@@ -11,13 +11,11 @@ from awstools.awstools import (
 )
 from buildtools.build_farm import BuildFarm
 from buildtools.build_hosts.ec2 import EC2BuildHost
+from buildtools.build_config import BuildConfig
 
 # imports needed for python type checking
 from typing import cast, Any, Dict, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from buildtools.build_config import BuildConfig
-    from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
+from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
 
 rootLogger = logging.getLogger()
 

@@ -2,11 +2,11 @@ import logging
 import abc
 import pprint
 
+from buildtools.build_config import BuildConfig
+
 # imports needed for python type checking
 from typing import Any, Dict, Optional, List, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from buildtools.build_config import BuildConfig
 
 rootLogger = logging.getLogger()
 

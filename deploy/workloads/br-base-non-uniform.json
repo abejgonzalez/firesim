@@ -7,7 +7,8 @@
   ],
   "common_simulation_outputs": [
     "uartlog",
-    "memory_stats*.csv"
+    "memory_stats*.csv",
+    "metasim_stderr.out"
   ],
   "deliver_dir": "/",
   "common_args": [],

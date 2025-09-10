@@ -35,12 +35,6 @@ class DefaultF1Config
         new midas.F1Config
     )
 
-class DefaultVitisConfig
-    extends Config(
-      new BaseMidasExamplesConfig ++
-        new midas.VitisConfig
-    )
-
 // used for PointerChaser testing
 class PointerChaserLPC
     extends Config((_, _, _) => { case MemModelKey =>

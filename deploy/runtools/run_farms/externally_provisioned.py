@@ -6,6 +6,9 @@ from collections import defaultdict
 
 from utils.inheritors import inheritors
 from runtools.instance_deploy_manager import InstanceDeployManager
+from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
+from runtools.instance_deploy_managers.xilinx_alveo import XilinxAlveoU200InstanceDeployManager, XilinxAlveoU250InstanceDeployManager, XilinxAlveoU280InstanceDeployManager
+from runtools.instance_deploy_managers.xilinx_vcu118 import XilinxVCU118InstanceDeployManager
 from runtools.run_farm import RunFarm, RunHost
 
 from typing import Any, Dict, List, TYPE_CHECKING

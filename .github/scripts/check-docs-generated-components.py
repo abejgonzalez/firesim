@@ -21,9 +21,7 @@ def run_docs_generated_components_check():
         with prefix('source sourceme-manager.sh --skip-ssh-setup'):
             with prefix("cd deploy"):
                 run("cat config_runtime.yaml")
-                if args.platform == FpgaPlatform.vitis:
-                    subpath = 'AWS-EC2-F1-Getting-Started'
-                elif args.platform == FpgaPlatform.xilinx_alveo_u250:
+                if args.platform == FpgaPlatform.xilinx_alveo_u250:
                     subpath = 'On-Premises-FPGA-Getting-Started'
                 else:
                     raise Exception(f"Unable to run this script with {args.platform}")

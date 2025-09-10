@@ -4,6 +4,7 @@
   "common_rootfs": "../../../../../software/firemarshal/images/firechip/bare-base/bare-base.img",
   "common_simulation_outputs": [
     "uartlog",
-    "memory_stats*.csv"
+    "memory_stats*.csv",
+    "metasim_stderr.out"
   ]
 }

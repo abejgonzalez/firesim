@@ -11,7 +11,8 @@
   "common_simulation_outputs": [
     "uartlog",
     "memory_stats*.csv",
-    "TRACEFILE*"
+    "TRACEFILE*",
+    "metasim_stderr.out"
   ],
   "post_run_hook": "gen-all-flamegraphs-fireperf.sh"
 }

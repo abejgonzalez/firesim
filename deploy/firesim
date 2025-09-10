@@ -43,6 +43,7 @@ from typing import Dict, Callable, Optional, TypedDict, get_type_hints, Tuple, L
 FLAGS = flags.FLAGS
 PLATFORM_LIST = [_.name for _ in Path(__file__).parent.parent.joinpath('platforms').iterdir()]
 flags.DEFINE_enum('platform', 'f1', PLATFORM_LIST, 'Required argument for "managerinit" to specify which platform you will be using')
+flags.DEFINE_string('task', None, 'Management task to run (overridden by argparse).')
 
 class Task(TypedDict):
     task: Callable
@@ -173,7 +174,7 @@ def managerinit():
             "managerinit replace start",
             "managerinit replace end",
             bf_recipe_lines)
-    elif flags.FLAGS.platform == 'vitis' or flags.FLAGS.platform == 'xilinx_alveo_u250' or flags.FLAGS.platform == 'xilinx_alveo_u280' or flags.FLAGS.platform == 'xilinx_alveo_u200' or flags.FLAGS.platform == 'xilinx_vcu118' or flags.FLAGS.platform == 'rhsresearch_nitefury_ii':
+    elif flags.FLAGS.platform == 'xilinx_alveo_u250' or flags.FLAGS.platform == 'xilinx_alveo_u280' or flags.FLAGS.platform == 'xilinx_alveo_u200' or flags.FLAGS.platform == 'xilinx_vcu118' or flags.FLAGS.platform == 'rhsresearch_nitefury_ii':
         runfarm_default_file = "run-farm-recipes/externally_provisioned.yaml"
         with open(runfarm_default_file, "r") as f:
             rf_recipe_lines = f.readlines()
@@ -181,7 +182,6 @@ def managerinit():
         start_lines += ["recipe_arg_overrides:\n"]
 
         deploy_manager_map = {
-            'vitis': 'VitisInstanceDeployManager',
             'xilinx_alveo_u200': 'XilinxAlveoU200InstanceDeployManager',
             'xilinx_alveo_u250': 'XilinxAlveoU250InstanceDeployManager',
             'xilinx_alveo_u280': 'XilinxAlveoU280InstanceDeployManager',
@@ -433,6 +433,7 @@ if __name__ == '__main__':
     # junk log files to be created. also lets us use args.task in the logfile
     # name
     args = construct_firesim_argparser().parse_args()
+    FLAGS.task = args.task # override the absl flag for task from the argparse one
 
     # logging setup
     def logfilename() -> str:

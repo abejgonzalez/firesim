@@ -3,7 +3,6 @@ import argparse
 import os
 
 class FpgaPlatform(Enum):
-    vitis = 'vitis'
     xilinx_alveo_u250 = 'xilinx_alveo_u250'
 
     def __str__(self):

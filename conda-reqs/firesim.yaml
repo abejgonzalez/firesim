@@ -21,7 +21,7 @@ dependencies:
 
     - gcc=13.2
     - gxx=13.2
-    - sysroot_linux-64=2.17 # needed to match pre-built CI XRT glibc version
+    - sysroot_linux-64=2.34 # needed to match pre-built CI XRT glibc version
     - conda-gcc-specs
     - binutils
 

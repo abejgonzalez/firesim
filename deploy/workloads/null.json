@@ -3,5 +3,5 @@
   "common_bootbinary": "unusedboot.bin",
   "common_rootfs": null,
   "common_outputs": [],
-  "common_simulation_outputs": []
+  "common_simulation_outputs": ["metasim_stderr.out"]
 }

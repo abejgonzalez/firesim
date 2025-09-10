@@ -7,6 +7,8 @@ from absl import flags
 from datetime import timedelta
 
 from runtools.run_farm import RunFarm
+from runtools.run_farms.ec2 import AWSEC2F1
+from runtools.run_farms.externally_provisioned import ExternallyProvisioned
 from runtools.simulation_configs.tracerv import TracerVConfig
 from runtools.simulation_configs.autocounter import AutoCounterConfig
 from runtools.simulation_configs.host_debug import HostDebugConfig

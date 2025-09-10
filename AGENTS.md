@@ -14,7 +14,7 @@ FireSim is particularly well-suited for datacenter-scale simulation and computer
                     It uses Fabric for remote execution and orchestration.
 *   **Verilog:** Chisel generates Verilog or SystemVerilog RTL, which is then used to build FPGA bitstreams for FPGA simulations or normal Verilator/VCS/Xcelium SW RTL simulations.
 *   **Xilinx FPGAs:** FireSim has first-class support for running simulations on Amazon EC2 F1 instances, which provide FPGAs in the cloud.
-                    It also supports other on-premise FPGAs such as the RHS Research NiteFury II, Xilinx Alveo U200/250/280, Xilinx VCU118, and AMD Vitis FPGAs.
+                    It also supports other on-premise FPGAs such as the RHS Research NiteFury II, Xilinx Alveo U200/250/280, and Xilinx VCU118.
 *   **RISC-V:** FireSim is commonly used to simulate RISC-V systems, including complex SoCs using the Chipyard platform.
                     When cloned individually (outside of Chipyard), it has a default set of tests that don't require running an entire SoC.
 
@@ -87,6 +87,11 @@ Formatting checks should be the last change done.
 FireSim lacks many smaller tests.
 However, for a simple smoke test that is mostly end-to-end, you can can run the ``build-driver-xilinx_alveo_u250`` tests in the Github Actions workflow file.
 This should build the default Verilog and C++ using ``make`` and then compile the C++ sources.
+
+### Midas Examples smoke test (non-manager)
+
+Run ``make TARGET_PROJECT=midasexamples run-vcs`` to test the Scala build flow and VCS metasimulation capabilities.
+Verify that ``sim/output/f1/f1-midasexamples-GCD-NoConfig-DefaultF1Config/GCD.vcs.out`` says ``PASSED`` for it to be successful.
 
 ### Avoiding FireSim manager testing
 

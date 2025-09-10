@@ -200,49 +200,6 @@ class XilinxVCU118Config
       case PostLinkCircuitPath         => Some("partition_wrapper/partition/firesim_top")
     }) ++ new SimConfig)
 
-class VitisConfig
-    extends Config(new Config((_, _, _) => {
-      case Platform                    => (p: Parameters) => new VitisShim()(p)
-      case CPUManagedAXI4Key           => None
-      case FPGAManagedAXI4Key          =>
-        val dataBits = 512
-        Some(
-          FPGAManagedAXI4Params(
-            // This value was chosen arbitrarily. Vitis makes it natural to
-            // request multiples of 1 GiB, and we may wish to expand this as after some
-            // performance analysis.
-            size               = 4096 * 1024,
-            dataBits           = dataBits,
-            // This was chosen to match the AXI4 recommendations and could change.
-            idBits             = 4,
-            // Don't support narrow reads/writes, and cap at a page per the AXI5 spec
-            writeTransferSizes = TransferSizes(dataBits / 8, 4096),
-            readTransferSizes  = TransferSizes(dataBits / 8, 4096),
-          )
-        )
-      case StreamEngineInstantiatorKey =>
-        (e: StreamEngineParameters, p: Parameters) => new FPGAManagedStreamEngine(p, e)
-      // Notes on width selection for the control bus
-      // Address: This needs further investigation. 12 may not be sufficient when using many auto counters
-      // ID:      AXI4Lite does not use ID bits. Use one here since Nasti (which
-      //          lacks a native AXI4LITE implementation) can't handle 0-width wires.
-      case CtrlNastiKey                => NastiParameters(32, 12, 1)
-      case HostMemChannelKey           =>
-        HostMemChannelParams(
-          size      = 0x400000000L, // 16 GiB
-          beatBytes = 8,
-          idBits    = 16,
-        )
-      // This could be as many as four on a U250, but support for the other
-      // channels requires adding address offsets in the shim (TODO).
-      case HostMemNumChannels          => 1
-      // We don't need to provide circuit paths because
-      // 1) The Shim module is the top-level of the kernel
-      // 2) Implementation constraints are scoped to the kernel level in our vitis flow
-      case PreLinkCircuitPath          => None
-      case PostLinkCircuitPath         => None
-    }) ++ new SimConfig)
-
 // Turns on all additional synthesizable debug features for checking the
 // implementation of the simulator.
 class HostDebugFeatures

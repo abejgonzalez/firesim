@@ -131,14 +131,6 @@ class BaseXilinxVCU118Config
         new midas.XilinxVCU118Config
     )
 
-class BaseVitisConfig
-    extends Config(
-      new WithDefaultMemModel ++
-        new WithWiringTransform ++
-        new WithAsyncResetReplacement ++
-        new midas.VitisConfig
-    )
-
 class NoConfig extends Config(Parameters.empty)
 
 class BaseBridgesConfig
@@ -150,9 +142,4 @@ class DefaultF1Config
     extends Config(
       new BaseBridgesConfig ++
         new midas.F1Config
-    )
-class DefaultVitisConfig
-    extends Config(
-      new BaseBridgesConfig ++
-        new midas.VitisConfig
     )

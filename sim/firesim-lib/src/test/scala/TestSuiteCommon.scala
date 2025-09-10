@@ -8,7 +8,7 @@ import scala.collection.mutable
 /** A base class that captures the platform-specific parts of the configuration of a test.
   *
   * @param platformName
-  *   Name of the target platform (f1 or vitis)
+  *   Name of the target platform (e.g., f1)
   * @param configs
   *   List of platform-specific configuration classes
   */
