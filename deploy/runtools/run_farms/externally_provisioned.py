@@ -4,9 +4,9 @@ import logging
 import pprint
 from collections import defaultdict
 
-from util.inheritors import inheritors
+from utils.inheritors import inheritors
 from runtools.instance_deploy_manager import InstanceDeployManager
-from ..run_farm import RunFarm, RunHost
+from runtools.run_farm import RunFarm, RunHost
 
 from typing import Any, Dict, List, TYPE_CHECKING
 

@@ -9,5 +9,5 @@ mypy --no-incremental \
     $FSIM_DIR/deploy/awstools/ \
     $FSIM_DIR/deploy/buildtools/ \
     $FSIM_DIR/deploy/runtools/ \
-    $FSIM_DIR/deploy/util/ \
+    $FSIM_DIR/deploy/utils/ \
     $FSIM_DIR/deploy/firesim

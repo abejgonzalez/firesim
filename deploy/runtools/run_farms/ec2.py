@@ -19,11 +19,11 @@ from awstools.awstools import (
     aws_resource_names,
     MockBoto3Instance,
 )
-from util.inheritors import inheritors
-from util.io import firesim_input
+from utils.inheritors import inheritors
+from utils.io import firesim_input
 from runtools.instance_deploy_manager import InstanceDeployManager
 from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
-from ..run_farm import RunFarm, RunHost
+from runtools.run_farm import RunFarm, RunHost
 
 from typing import Any, Dict, Optional, List, Union, Tuple, TYPE_CHECKING
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource

@@ -4,7 +4,7 @@ import logging
 import abc
 import os
 
-from util.inheritors import inheritors
+from utils.inheritors import inheritors
 
 from typing import Any, Dict, Type, Optional, List, Union, Tuple, TYPE_CHECKING
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource

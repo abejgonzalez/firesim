@@ -6,8 +6,8 @@ import logging
 from fabric.api import prefix, local, run, cd, warn_only, put, settings  # type: ignore
 import os
 
-from ..instance_deploy_manager import InstanceDeployManager
-from ..nbd_tracker import NBDTracker
+from runtools.instance_deploy_manager import InstanceDeployManager
+from runtools.nbd_tracker import NBDTracker
 
 from typing import TYPE_CHECKING
 

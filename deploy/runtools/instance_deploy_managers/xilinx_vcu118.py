@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fabric.api import run, cd, put  # type: ignore
 
-from ..instance_deploy_manager import InstanceDeployManager
+from runtools.instance_deploy_manager import InstanceDeployManager
 from runtools.utils import check_script, script_path
 
 from typing import Optional, TYPE_CHECKING

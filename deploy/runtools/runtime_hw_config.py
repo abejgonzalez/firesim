@@ -15,21 +15,21 @@ from awstools.afitools import (
     firesim_description_to_tags,
 )
 from runtools.utils import is_on_aws
-from util.targetprojectutils import extra_target_project_make_args, resolve_path
+from utils.targetprojectutils import extra_target_project_make_args, resolve_path
 from buildtools.utils import get_deploy_dir
-from util.streamlogger import InfoStreamLogger
-from util.export import create_export_string
-from .uri_container import URIContainer
+from utils.streamlogger import InfoStreamLogger
+from utils.export import create_export_string
+from runtools.uri_container import URIContainer
 
 from typing import Optional, Dict, Any, List, Sequence, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.utils import MacAddress
-    from .simulation_configs.tracerv import TracerVConfig
-    from .simulation_configs.autocounter import AutoCounterConfig
-    from .simulation_configs.host_debug import HostDebugConfig
-    from .simulation_configs.synth_print import SynthPrintConfig
-    from .simulation_configs.partition import PartitionConfig
+    from runtools.simulation_configs.tracerv import TracerVConfig
+    from runtools.simulation_configs.autocounter import AutoCounterConfig
+    from runtools.simulation_configs.host_debug import HostDebugConfig
+    from runtools.simulation_configs.synth_print import SynthPrintConfig
+    from runtools.simulation_configs.partition import PartitionConfig
 
 rootLogger = logging.getLogger()
 

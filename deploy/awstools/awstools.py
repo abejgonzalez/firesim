@@ -31,7 +31,7 @@ if __name__ == "__main__":
     # use builtin.input because we aren't in a StreamLogger context
     from builtins import input as firesim_input
 else:
-    from util.io import firesim_input
+    from utils.io import firesim_input
 
 rootLogger = logging.getLogger()
 

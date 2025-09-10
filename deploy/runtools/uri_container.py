@@ -7,7 +7,7 @@ from pathlib import Path
 from os.path import join as pjoin
 from os.path import expanduser
 
-from util.io import downloadURI
+from utils.io import downloadURI
 
 from typing import Optional, Tuple, TYPE_CHECKING
 

@@ -6,14 +6,14 @@ import logging
 import yaml
 from absl import flags
 
-from util.inheritors import inheritors
+from utils.inheritors import inheritors
 from runtools.runtime_hwdb import RuntimeHWDB
 from buildtools.build_config import BuildConfig
 from buildtools.build_farm import BuildFarm
 from buildtools.build_farms.externally_provisioned import ExternallyProvisioned
 from buildtools.build_farms.ec2 import AWSEC2
 
-from util.deepmerge import deep_merge
+from utils.deepmerge import deep_merge
 
 # imports needed for python type checking
 from typing import List, Set, TYPE_CHECKING

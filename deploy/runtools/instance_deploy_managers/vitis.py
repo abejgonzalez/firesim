@@ -6,7 +6,7 @@ import logging
 import json
 from fabric.api import run, cd, settings, hide, put  # type: ignore
 
-from ..instance_deploy_manager import InstanceDeployManager
+from runtools.instance_deploy_manager import InstanceDeployManager
 
 from typing import TYPE_CHECKING
 

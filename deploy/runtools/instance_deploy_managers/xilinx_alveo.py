@@ -10,7 +10,7 @@ from pathlib import Path
 from fabric.api import run, cd, put  # type: ignore
 from fabric.contrib.project import rsync_project  # type: ignore
 
-from ..instance_deploy_manager import InstanceDeployManager
+from runtools.instance_deploy_manager import InstanceDeployManager
 from runtools.utils import check_script, script_path
 from buildtools.utils import get_deploy_dir
 

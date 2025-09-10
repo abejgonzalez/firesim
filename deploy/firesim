@@ -34,9 +34,9 @@ from awstools.afitools import share_agfi_in_all_regions
 from buildtools.build_config_file import BuildConfigFile
 from buildtools.bitbuilders.f1 import F1BitBuilder
 
-from util.streamlogger import StreamLogger, InfoStreamLogger
-from util.filelineswap import file_line_swap
-from util.io import firesim_input
+from utils.streamlogger import StreamLogger, InfoStreamLogger
+from utils.filelineswap import file_line_swap
+from utils.io import firesim_input
 
 from typing import Dict, Callable, Optional, TypedDict, get_type_hints, Tuple, List
 

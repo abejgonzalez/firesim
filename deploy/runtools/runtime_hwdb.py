@@ -3,7 +3,7 @@ from __future__ import annotations
 import pprint
 import yaml
 
-from .runtime_hw_config import RuntimeHWConfig
+from runtools.runtime_hw_config import RuntimeHWConfig
 
 from typing import Dict
 

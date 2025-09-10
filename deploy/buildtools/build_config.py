@@ -6,12 +6,12 @@ import logging
 import pprint
 import yaml
 
-from util.inheritors import inheritors
+from utils.inheritors import inheritors
 from awstools.awstools import valid_aws_configure_creds, aws_resource_names
 from buildtools.bitbuilder import BitBuilder
 import buildtools
-from util.deepmerge import deep_merge
-from util.targetprojectutils import extra_target_project_make_args, resolve_path
+from utils.deepmerge import deep_merge
+from utils.targetprojectutils import extra_target_project_make_args, resolve_path
 
 # imports needed for python type checking
 from typing import Any, Optional, Dict, TYPE_CHECKING

@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import logging
 
-from .runtime_hw_config import RuntimeHWConfig, LOCAL_DRIVERS_GENERATED_SRC
-from util.targetprojectutils import resolve_path
+from runtools.runtime_hw_config import RuntimeHWConfig, LOCAL_DRIVERS_GENERATED_SRC
+from utils.targetprojectutils import resolve_path
 
 from typing import Any, Dict, List, Optional, Sequence, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.utils import MacAddress
-    from .simulation_configs.tracerv import TracerVConfig
-    from .simulation_configs.autocounter import AutoCounterConfig
-    from .simulation_configs.host_debug import HostDebugConfig
-    from .simulation_configs.synth_print import SynthPrintConfig
-    from .simulation_configs.partition import PartitionConfig
+    from runtools.simulation_configs.tracerv import TracerVConfig
+    from runtools.simulation_configs.autocounter import AutoCounterConfig
+    from runtools.simulation_configs.host_debug import HostDebugConfig
+    from runtools.simulation_configs.synth_print import SynthPrintConfig
+    from runtools.simulation_configs.partition import PartitionConfig
 
 rootLogger = logging.getLogger()
 

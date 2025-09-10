@@ -9,12 +9,12 @@ from time import strftime, gmtime
 
 from typing import Tuple, List
 
-from .runtime_hwdb import RuntimeHWDB
-from .inner_runtime_configuration import InnerRuntimeConfiguration
-from .run_farm import RunFarm
-from .workload import WorkloadConfig
-from .topology.core_with_passes import FireSimTopologyWithPasses
-from .runtime_build_recipes import RuntimeBuildRecipes
+from runtools.runtime_hwdb import RuntimeHWDB
+from runtools.inner_runtime_configuration import InnerRuntimeConfiguration
+from runtools.run_farm import RunFarm
+from runtools.workload import WorkloadConfig
+from runtools.topology.core_with_passes import FireSimTopologyWithPasses
+from runtools.runtime_build_recipes import RuntimeBuildRecipes
 
 rootLogger = logging.getLogger()
 

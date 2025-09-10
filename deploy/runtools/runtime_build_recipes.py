@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import yaml
 
-from .runtime_hwdb import RuntimeHWDB
-from .runtime_build_recipe_config import RuntimeBuildRecipeConfig
+from runtools.runtime_hwdb import RuntimeHWDB
+from runtools.runtime_build_recipe_config import RuntimeBuildRecipeConfig
 
 
 class RuntimeBuildRecipes(RuntimeHWDB):

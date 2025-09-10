@@ -4,8 +4,12 @@ topology.
 
 from __future__ import annotations
 
-from .user_topologies import UserTopologies
-from .elements import FireSimSwitchNode, FireSimServerNode, FireSimPipeNode
+from runtools.topology.user_topologies import UserTopologies
+from runtools.topology.elements import (
+    FireSimSwitchNode,
+    FireSimServerNode,
+    FireSimPipeNode,
+)
 
 from typing import List, TYPE_CHECKING
 

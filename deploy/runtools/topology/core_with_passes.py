@@ -14,30 +14,30 @@ from colorama import Fore, Style  # type: ignore
 from functools import reduce
 from tempfile import TemporaryDirectory
 
-from .elements import (
+from runtools.topology.elements import (
     FireSimNode,
     FireSimPipeNode,
     FireSimServerNode,
     FireSimDummyServerNode,
     FireSimSwitchNode,
 )
-from .core import FireSimTopology
-from ..utils import MacAddress
-from ..simulation_configs.tracerv import TracerVConfig
-from ..simulation_configs.autocounter import AutoCounterConfig
-from ..simulation_configs.host_debug import HostDebugConfig
-from ..simulation_configs.synth_print import SynthPrintConfig
-from ..simulation_configs.partition import PartitionConfig
+from runtools.topology.core import FireSimTopology
+from runtools.utils import MacAddress
+from runtools.simulation_configs.tracerv import TracerVConfig
+from runtools.simulation_configs.autocounter import AutoCounterConfig
+from runtools.simulation_configs.host_debug import HostDebugConfig
+from runtools.simulation_configs.synth_print import SynthPrintConfig
+from runtools.simulation_configs.partition import PartitionConfig
 
-from ..instance_deploy_manager import InstanceDeployManager
+from runtools.instance_deploy_manager import InstanceDeployManager
 from typing import Dict, Any, cast, List, Set, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from ..run_farm import RunFarm
-    from ..runtime_hwdb import RuntimeHWDB
-    from ..runtime_build_recipes import RuntimeBuildRecipes
-    from ..runtime_hw_config import RuntimeHWConfig
-    from ..workload import WorkloadConfig
+    from runtools.run_farm import RunFarm
+    from runtools.runtime_hwdb import RuntimeHWDB
+    from runtools.runtime_build_recipes import RuntimeBuildRecipes
+    from runtools.runtime_hw_config import RuntimeHWConfig
+    from runtools.workload import WorkloadConfig
 
 rootLogger = logging.getLogger()
 

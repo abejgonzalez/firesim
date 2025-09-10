@@ -8,8 +8,8 @@ from fabric.contrib.console import confirm  # type: ignore
 from fabric.contrib.project import rsync_project  # type: ignore
 
 from buildtools.utils import get_deploy_dir
-from util.streamlogger import InfoStreamLogger
-from util.export import create_export_string
+from utils.streamlogger import InfoStreamLogger
+from utils.export import create_export_string
 from awstools.afitools import firesim_tags_to_description, copy_afi_to_all_regions
 from awstools.awstools import (
     send_firesim_notification,
