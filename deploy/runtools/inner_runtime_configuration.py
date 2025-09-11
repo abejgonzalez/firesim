@@ -22,6 +22,17 @@ from typing import Optional
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_multi_string(
+    "overrideconfigdata",
+    "",
+    'Override the values created from the config_runtime.yaml. Provide a JSON or YAML string (e.g., --overrideconfigdata "{"target_config": {"link_latency": 6405}}"). Additionally can be specified multiple times (with override priority given to later overrides).',
+)
+flags.DEFINE_string(
+    "runtimeconfigfile",
+    "config_runtime.yaml",
+    "Optional custom runtime/workload config file.",
+)
+
 
 class InnerRuntimeConfiguration:
     """Pythonic version of config_runtime.yaml"""
@@ -59,16 +70,13 @@ class InnerRuntimeConfiguration:
         runtime_dict = runtime_configfile
 
         # override parts of the runtime conf if specified
-        if FLAGS.overrideconfigdata != "":
-            ## handle overriding part of the runtime conf
-            configoverrideval = FLAGS.overrideconfigdata.split()
-            overridesection = configoverrideval[0]
-            overridefield = configoverrideval[1]
-            overridevalue = configoverrideval[2]
-            logging.warning("Overriding part of the runtime config with: ")
-            logging.warning(f'"[{overridesection}]"')
-            logging.warning(f"{overridefield}={overridevalue}")
-            runtime_dict[overridesection][overridefield] = overridevalue
+        for override in FLAGS.overrideconfigdata:
+            override_data = yaml.safe_load(override)
+            logging.warning(
+                f"""Overriding part of the runtime config with:\n{override_data}"""
+            )
+            runtime_dict = deep_merge(runtime_dict, override_data)
+            logging.debug(f"""Overridden runtime config: {runtime_dict}""")
 
         def dict_assert(key_check, dict_name):
             assert (

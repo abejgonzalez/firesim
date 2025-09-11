@@ -19,19 +19,11 @@ from runtools.runtime_build_recipes import RuntimeBuildRecipes
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string(
-    "runtimeconfigfile",
-    "config_runtime.yaml",
-    "Optional custom runtime/workload config file.",
-)
+
 flags.DEFINE_string(
     "hwdbconfigfile", "config_hwdb.yaml", "Optional custom HW database config file."
 )
-flags.DEFINE_string(
-    "overrideconfigdata",
-    "",
-    'Override a single value from one of the the RUNTIME e.g.: --overrideconfigdata "target-config link-latency 6405".',
-)
+
 
 flags.DEFINE_multi_string(
     "terminatesome",

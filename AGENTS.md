@@ -62,7 +62,7 @@ This command should add the FireSim manager to the path, setup the ``conda`` env
 
 ## 3. Testing and Coding Checks
 
-Tests for the repository use CI found in the ``.github`` folder using Github Actions.
+CI Tests for the repository are found in the ``.github`` folder using Github Actions.
 These are a non-exhaustive list of tests that you can use to check code (i.e. linting, syntax checking).
 **Importantly, remember that you need to have a pre-setup repository with the ``sourceme-manager.sh`` script sourced (see above for the exact command) for these tests to work.**
 To do so, you can run the following command to verify that it is sourced properly (if the command fails then it isn't sourced):
@@ -82,21 +82,28 @@ For typechecking, Python code uses ``mypy``.
 For C++ code, testing is currently disabled for linting.
 Formatting checks should be the last change done.
 
-### Running an end-to-end smoke test
+### Running a CI end-to-end smoke test
 
 FireSim lacks many smaller tests.
 However, for a simple smoke test that is mostly end-to-end, you can can run the ``build-driver-xilinx_alveo_u250`` tests in the Github Actions workflow file.
 This should build the default Verilog and C++ using ``make`` and then compile the C++ sources.
 
-### Midas Examples smoke test (non-manager)
+### Midas Examples smoke test without using the manager
 
 Run ``make TARGET_PROJECT=midasexamples run-vcs`` to test the Scala build flow and VCS metasimulation capabilities.
 Verify that ``sim/output/f1/f1-midasexamples-GCD-NoConfig-DefaultF1Config/GCD.vcs.out`` says ``PASSED`` for it to be successful.
 
-### Avoiding FireSim manager testing
+### Simple FireSim manager testing
 
-Avoid testing directly with the FireSim manager (i.e., running ``launchrunfarm``, or other manager tasks).
-This is because these tests require changes to the ``config_*.yaml`` files in the ``deploy`` directory which require user intervention.
+To do simple FireSim manager testing (**required for any Python change**), you can run the following script: ``regression/simple-singlenode-metasim-manager-test.py``.
+There are four tests that you should run with it:
+
+1. ./regression/simple-singlenode-metasim-manager-test.py localhost /scratch/abejgonza/FIRESIM_RUNS_DIR/ vcs
+2. ./regression/simple-singlenode-metasim-manager-test.py localhost /scratch/abejgonza/FIRESIM_RUNS_DIR/ verilator
+3. ./regression/simple-singlenode-metasim-manager-test.py as2 /scratch/abejgonza/FIRESIM_RUNS_DIR/ vcs
+4. ./regression/simple-singlenode-metasim-manager-test.py as2 /scratch/abejgonza/FIRESIM_RUNS_DIR/ verilator
+
+These tests, respectively test that the manager works locally/remotely and with VCS or Verilator (for RTL simulations).
 
 ## 4. General Guidance
 
