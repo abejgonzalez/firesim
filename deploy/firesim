@@ -40,7 +40,7 @@ from typing import Dict, Callable, Optional, TypedDict, get_type_hints, Tuple, L
 
 FLAGS = flags.FLAGS
 PLATFORM_LIST = [_.name for _ in Path(__file__).parent.parent.joinpath('platforms').iterdir()]
-flags.DEFINE_enum('platform', 'f1', PLATFORM_LIST, 'Required argument for "managerinit" to specify which platform you will be using')
+flags.DEFINE_enum('platform', 'xilinx_alveo_u250', PLATFORM_LIST, 'Required argument for "managerinit" to specify which platform you will be using')
 
 class Task(TypedDict):
     task: Callable
