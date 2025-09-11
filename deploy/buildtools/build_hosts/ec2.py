@@ -3,7 +3,6 @@ import pprint
 from buildtools.build_farm import BuildHost
 from buildtools.build_config import BuildConfig
 
-from typing import TYPE_CHECKING
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
 
 

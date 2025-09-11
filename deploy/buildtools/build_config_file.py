@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from time import strftime, gmtime
 import pprint
-import logging
+from absl import logging
 import yaml
 from absl import flags
 
@@ -20,8 +20,6 @@ from typing import List, Set, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from absl.flags import FlagValues
-
-rootLogger = logging.getLogger()
 
 FLAGS = flags.FLAGS
 
@@ -174,7 +172,7 @@ class BuildConfigFile:
             ip = self.build_farm.get_build_host_ip(build)
             if ip in self.build_ip_set:
                 error_msg = f"ERROR: Duplicate {ip} IP used when launching instance."
-                rootLogger.critical(error_msg)
+                logging.fatal(error_msg)
                 self.release_build_hosts()
                 raise Exception(error_msg)
             else:

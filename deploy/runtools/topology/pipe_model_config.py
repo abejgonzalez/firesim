@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import random
 import string
-import logging
+from absl import logging
 import os
 
 from numpy import partition
@@ -16,8 +16,6 @@ from typing import List, Dict, TYPE_CHECKING
 if TYPE_CHECKING:
     from runtools.topology.elements import FireSimPipeNode, FireSimServerNode
     from runtools.runtime_hw_config import RuntimeHWConfig
-
-rootLogger = logging.getLogger()
 
 
 GENERATED_PARTITION_PARAMS_FILE = "FireSim-generated.partition.const.h"
@@ -81,7 +79,7 @@ class AbstractPipeToPipeConfig:
             hwconfig.get_platform(),
             hwconfig.get_deployquintuplet_for_config(),
         )
-        rootLogger.info(f"runtime_conf_path {runtime_conf_path}")
+        logging.info(f"runtime_conf_path {runtime_conf_path}")
         return os.path.join(runtime_conf_path, GENERATED_PARTITION_PARAMS_FILE)
 
     def parse_partition_config_file(self, f: str) -> List[PartitionBoundaryParams]:
@@ -120,14 +118,14 @@ class AbstractPipeToPipeConfig:
 
     def collect_partition_boundary_params(self) -> None:
         for server in self.fsimpipenode.partition_edge:
-            rootLogger.debug(
+            logging.debug(
                 f"topology, {server}:{server.server_id_internal} {server.is_leaf_partition()}"
             )
             assert (
                 server.is_partition()
             ), f"{server} is not a partitioned server although it is connected to a partition pipe"
             if server.is_leaf_partition():
-                rootLogger.info(
+                logging.info(
                     f"server_hwdb {server.get_resolved_server_hardware_config()}"
                 )
                 pcfg_file = self.partition_config_file(
@@ -144,7 +142,7 @@ class AbstractPipeToPipeConfig:
                 else self.server_boundary_widths[0]
             )
             self.server_cutbridge_idx_map[server] = boundary_param.global_idx()
-            rootLogger.info(
+            logging.info(
                 f"collect_partition_boundary_params {server} {server.server_id_internal} {boundary_param.global_idx()}"
             )
 
@@ -242,17 +240,17 @@ class AbstractPipeToPipeConfig:
             pipeorigdir + binaryname + "-" + self.build_disambiguate + "-build/"
         )
 
-        rootLogger.info(
+        logging.info(
             "Building pipe model binary for pipe " + str(self.pipe_binary_name())
         )
 
-        rootLogger.debug(str(configfile))
+        logging.debug(str(configfile))
 
         def local_logged(command: str) -> None:
             """Run local command with logging."""
             localcap = local(command, capture=True)
-            rootLogger.debug(localcap)
-            rootLogger.debug(localcap.stderr)
+            logging.debug(localcap)
+            logging.debug(localcap.stderr)
 
         # make a build dir for this pipe
         local_logged("mkdir -p " + pipebuilddir)

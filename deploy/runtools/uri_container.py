@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-import logging
+from absl import logging
 import hashlib
 from pathlib import Path
 from os.path import join as pjoin
@@ -14,7 +14,6 @@ from typing import Optional, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from .runtime_hw_config import RuntimeHWConfig
 
-rootLogger = logging.getLogger()
 
 # from  https://github.com/pandas-dev/pandas/blob/96b036cbcf7db5d3ba875aac28c4f6a678214bfb/pandas/io/common.py#L73
 _RFC_3986_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+\-+.]*://")
@@ -101,7 +100,7 @@ class URIContainer:
 
         # When it exists, return the same information, but skip the download
         if Path(destination).exists():
-            rootLogger.debug(f"Skipping download of uri: '{uri}'")
+            logging.debug(f"Skipping download of uri: '{uri}'")
             return (uri, destination)
 
         try:

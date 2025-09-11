@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import random
-import logging
+from absl import logging
 import os
 
 from datetime import datetime, timedelta
@@ -25,15 +25,10 @@ from mypy_boto3_s3.literals import BucketLocationConstraintType
 
 
 if __name__ == "__main__":
-    # setup basic config for logging
-    logging.basicConfig()
-
     # use builtin.input because we aren't in a StreamLogger context
     from builtins import input as firesim_input
 else:
     from utils.io import firesim_input
-
-rootLogger = logging.getLogger()
 
 
 # this needs to be updated whenever the FPGA Dev AMI changes
@@ -138,14 +133,14 @@ def get_localhost_instance_info(url_ext: str) -> Optional[str]:
             f"curl -s --connect-timeout {curl_connection_timeout} http://169.254.169.254/latest/{url_ext}",
             capture=True,
         )
-        rootLogger.debug(res.stdout)
-        rootLogger.debug(res.stderr)
+        logging.debug(res.stdout)
+        logging.debug(res.stderr)
 
     if res.return_code == 0:
-        rootLogger.debug("AWS Host Detected")
+        logging.debug("AWS Host Detected")
         return res.stdout
     else:
-        rootLogger.debug("Non-AWS Host Detected")
+        logging.debug("Non-AWS Host Detected")
         return None
 
 
@@ -166,7 +161,7 @@ def get_localhost_instance_tags() -> Dict[str, Any]:
         A ``dict`` of tags (name -> value). Empty if no tags found or can't access the inst id.
     """
     instanceid = get_localhost_instance_id()
-    rootLogger.debug(instanceid)
+    logging.debug(instanceid)
 
     resptags: Dict[str, Any] = {}
 
@@ -192,7 +187,7 @@ def get_localhost_instance_tags() -> Dict[str, Any]:
 
         for pair in resp_pairs:
             resptags[pair["Key"]] = pair["Value"]
-        rootLogger.debug(resptags)
+        logging.debug(resptags)
 
     return resptags
 
@@ -270,18 +265,16 @@ def farm_security_group_setup() -> None:
     )
 
     if len(firesimsecuritygroup) > 1:
-        rootLogger.critical(
-            f"Too many security groups named {securitygroupname}. Exiting."
-        )
+        logging.fatal(f"Too many security groups named {securitygroupname}. Exiting.")
         assert False
     elif len(firesimsecuritygroup) == 1:
-        rootLogger.debug(
+        logging.debug(
             f"Security group {securitygroupname} already exists. Skipping setup."
         )
         return
 
     # at this point, we do not have the required security group, so create it
-    rootLogger.info(
+    logging.info(
         f"The {securitygroupname} security group does not exist. Creating it for you."
     )
 
@@ -356,7 +349,7 @@ def farm_security_group_setup() -> None:
         ]
     )
 
-    rootLogger.info(
+    logging.info(
         f"The {securitygroupname} security group has been successfully created!"
     )
 
@@ -368,7 +361,7 @@ def awsinit() -> None:
     while not valid_creds:
         # only run aws configure if we cannot already find valid creds
         # this loops calling valid_aws_configure_creds until
-        rootLogger.info(
+        logging.info(
             "Running aws configure. You must specify your AWS account info here to use the FireSim Manager."
         )
         local("aws configure")
@@ -376,7 +369,7 @@ def awsinit() -> None:
         # check again
         valid_creds = valid_aws_configure_creds()
         if not valid_creds:
-            rootLogger.info("Invalid AWS credentials. Try again.")
+            logging.info("Invalid AWS credentials. Try again.")
 
     farm_security_group_setup()
 
@@ -386,7 +379,7 @@ def awsinit() -> None:
     if useremail != "":
         subscribe_to_firesim_topic(useremail)
     else:
-        rootLogger.info(
+        logging.info(
             "You did not supply an email address. No notifications will be sent."
         )
 
@@ -401,7 +394,7 @@ def get_f1_ami_id() -> str:
     for increment in range(MAX_ATTEMPTS):
         ami_search_name = get_incremented_f1_ami_name(get_f1_ami_name(), increment)
         if increment > 0:
-            rootLogger.warning(
+            logging.warning(
                 f"AMI {get_f1_ami_name()} not found. Trying: {ami_search_name}."
             )
         response = client.describe_images(
@@ -409,7 +402,7 @@ def get_f1_ami_id() -> str:
         )
         if len(response["Images"]) >= 1:
             if increment > 0:
-                rootLogger.warning(
+                logging.warning(
                     f"AMI {get_f1_ami_name()} not found. Successfully found: {ami_search_name}."
                 )
             break
@@ -570,13 +563,13 @@ def launch_instances(
         instances = []
 
     if len(instances):
-        rootLogger.info(
+        logging.info(
             "Already have {} of {} {} instances.".format(
                 len(instances), count, instancetype
             )
         )
         if len(instances) < count:
-            rootLogger.info(
+            logging.info(
                 "Launching remaining {} {} instances".format(
                     count - len(instances), instancetype
                 )
@@ -631,14 +624,14 @@ def launch_instances(
             instances += instance
 
         except client.exceptions.ClientError as e:
-            rootLogger.debug(e)
+            logging.debug(e)
             startsubnet += 1
             if startsubnet < len(subnets):
-                rootLogger.debug(
+                logging.debug(
                     "This probably means there was no more capacity in this availability zone. Trying the next one."
                 )
             else:
-                rootLogger.info(
+                logging.info(
                     "Tried all subnets, but there was insufficient capacity to launch your instances"
                 )
                 startsubnet = 0
@@ -649,31 +642,31 @@ def launch_instances(
                     first_subnet_wraparound = datetime.now() - timedelta(microseconds=1)
 
                 time_elapsed = datetime.now() - first_subnet_wraparound
-                rootLogger.info(
+                logging.info(
                     "have been trying for {} using timeout of {}".format(
                         time_elapsed, timeout
                     )
                 )
-                rootLogger.info(
+                logging.info(
                     """only {} of {} {} instances have been launched""".format(
                         len(instances), count, instancetype
                     )
                 )
                 if time_elapsed > timeout:
-                    rootLogger.critical(
+                    logging.fatal(
                         """Aborting! only the following {} instances were launched""".format(
                             len(instances)
                         )
                     )
-                    rootLogger.critical(instances)
-                    rootLogger.critical(
+                    logging.fatal(instances)
+                    logging.fatal(
                         "To continue trying to allocate instances, you can rerun launchrunfarm"
                     )
                     sys.exit(1)
                 else:
-                    rootLogger.info("Will keep trying after sleeping for a bit...")
+                    logging.info("Will keep trying after sleeping for a bit...")
                     time.sleep(30)
-                    rootLogger.info(
+                    logging.info(
                         "Continuing to request remaining {}, {} instances".format(
                             count - len(instances), instancetype
                         )
@@ -833,12 +826,10 @@ def wait_on_instance_launches(
 ) -> None:
     """Take a list of instances (as returned by create_instances), wait until
     instance is running."""
-    rootLogger.info(
-        "Waiting for instance boots: " + str(len(instances)) + " " + message
-    )
+    logging.info("Waiting for instance boots: " + str(len(instances)) + " " + message)
     for instance in instances:
         instance.wait_until_running()
-        rootLogger.info(str(instance.id) + " booted!")
+        logging.info(str(instance.id) + " booted!")
 
 
 def terminate_instances(instanceids: List[str], dryrun: bool = True) -> None:
@@ -874,19 +865,19 @@ def auto_create_bucket(userbucketname: str) -> None:
         s3cli.head_bucket(Bucket=userbucketname)
     except s3cli.exceptions.ClientError as exc:
         if "Forbidden" in repr(exc):
-            rootLogger.critical(
+            logging.fatal(
                 f"You tried to access a bucket {userbucketname} that is Forbidden. This probably means that someone else has taken the name already."
             )
-            rootLogger.critical("The full exception is printed below:")
-            rootLogger.critical(
+            logging.fatal("The full exception is printed below:")
+            logging.fatal(
                 "____________________________________________________________"
             )
-            rootLogger.critical(repr(exc))
+            logging.fatal(repr(exc))
             assert False
 
         elif "Not Found" in repr(exc):
             # create the bucket for the user and setup directory structure
-            rootLogger.info("Creating s3 bucket for you named: " + userbucketname)
+            logging.info("Creating s3 bucket for you named: " + userbucketname)
             my_session = boto3.session.Session()
             my_region: BucketLocationConstraintType
             my_region = my_session.region_name  # type: ignore
@@ -908,14 +899,14 @@ def auto_create_bucket(userbucketname: str) -> None:
             resp2 = s3cli.put_object(Bucket=userbucketname, Body=b"", Key="logs/")
 
         else:
-            rootLogger.critical(
+            logging.fatal(
                 "Unknown error creating bucket. Please report this issue on the FireSim Github repo."
             )
-            rootLogger.critical("The full exception is printed below:")
-            rootLogger.critical(
+            logging.fatal("The full exception is printed below:")
+            logging.fatal(
                 "____________________________________________________________"
             )
-            rootLogger.critical(repr(exc))
+            logging.fatal(repr(exc))
             assert False
 
 
@@ -931,14 +922,14 @@ def get_snsname_arn() -> Optional[str]:
         response = client.create_topic(Name=snsname)
     except client.exceptions.ClientError as err:
         if "AuthorizationError" in repr(err):
-            rootLogger.warning(
+            logging.warning(
                 'You don\'t have permissions to perform "Topic Creation ". Required to send you email notifications. Please contact your IT administrator'
             )
         else:
-            rootLogger.warning(
+            logging.warning(
                 'Unknown exception is encountered while trying to perform "Topic Creation"'
             )
-        rootLogger.warning(err)
+        logging.warning(err)
         return None
 
     return response["TopicArn"]
@@ -959,17 +950,17 @@ receive any notifications until you click the confirmation link.""".format(
             email
         )
 
-        rootLogger.info(message)
+        logging.info(message)
     except client.exceptions.ClientError as err:
         if "AuthorizationError" in repr(err):
-            rootLogger.warning(
+            logging.warning(
                 "You don't have permissions to subscribe to firesim notifications"
             )
         else:
-            rootLogger.warning(
+            logging.warning(
                 "Unknown exception is encountered while trying subscribe notifications"
             )
-        rootLogger.warning(err)
+        logging.warning(err)
 
 
 def send_firesim_notification(subject: str, body: str) -> None:
@@ -984,14 +975,14 @@ def send_firesim_notification(subject: str, body: str) -> None:
         response = client.publish(TopicArn=arn, Message=body, Subject=subject)
     except client.exceptions.ClientError as err:
         if "AuthorizationError" in repr(err):
-            rootLogger.warning(
+            logging.warning(
                 "You don't have permissions to publish to firesim notifications"
             )
         else:
-            rootLogger.warning(
+            logging.warning(
                 "Unknown exception is encountered while trying publish notifications"
             )
-        rootLogger.warning(err)
+        logging.warning(err)
 
 
 def main(args: List[str]) -> int:

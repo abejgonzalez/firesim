@@ -1,7 +1,7 @@
 from __future__ import with_statement, annotations
 
 import yaml
-import logging
+from absl import logging
 import os
 from fabric.api import prefix, local, run, env, lcd, parallel, settings  # type: ignore
 from fabric.contrib.console import confirm  # type: ignore
@@ -27,8 +27,6 @@ from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from buildtools.build_config import BuildConfig
-
-rootLogger = logging.getLogger()
 
 
 class XilinxAlveoBitBuilder(BitBuilder):
@@ -77,8 +75,8 @@ class XilinxAlveoBitBuilder(BitBuilder):
             extra_opts="-L",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
         rsync_cap = rsync_project(
             local_dir=f"{local_alveo_dir}/{fpga_build_postfix}/",
             remote_dir=f"{dest_alveo_dir}/{fpga_build_postfix}",
@@ -86,8 +84,8 @@ class XilinxAlveoBitBuilder(BitBuilder):
             extra_opts="-L",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         return f"{dest_alveo_dir}/{fpga_build_postfix}"
 
@@ -119,12 +117,12 @@ class XilinxAlveoBitBuilder(BitBuilder):
                 + self.build_config.get_chisel_quintuplet()
             )
 
-            rootLogger.info(message_title)
-            rootLogger.info(message_body)
+            logging.info(message_title)
+            logging.info(message_body)
 
             build_farm.release_build_host(self.build_config)
 
-        rootLogger.info(
+        logging.info(
             f"Building Xilinx Alveo {self.build_config.PLATFORM} Bitstream from Verilog"
         )
 
@@ -149,8 +147,8 @@ class XilinxAlveoBitBuilder(BitBuilder):
             extra_opts="-L",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         fpga_frequency = self.build_config.get_frequency()
         build_strategy = self.build_config.get_strategy().name
@@ -162,9 +160,9 @@ class XilinxAlveoBitBuilder(BitBuilder):
             alveo_rc = alveo_result.return_code
 
             if alveo_rc != 0:
-                rootLogger.info("Printing error output:")
+                logging.info("Printing error output:")
                 for line in alveo_result.splitlines()[-100:]:
-                    rootLogger.info(line)
+                    logging.info(line)
 
         # put build results in the result-build area
 
@@ -176,8 +174,8 @@ class XilinxAlveoBitBuilder(BitBuilder):
             extra_opts="-l",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         if alveo_rc != 0:
             on_build_failure()
@@ -218,8 +216,8 @@ class XilinxAlveoBitBuilder(BitBuilder):
         message_title = "FireSim FPGA Build Completed"
         message_body = f"Your bitstream has been created!\nAdd\n\n{hwdb_entry}\nto your config_hwdb.yaml to use this hardware configuration."
 
-        rootLogger.info(message_title)
-        rootLogger.info(message_body)
+        logging.info(message_title)
+        logging.info(message_body)
 
         # for convenience when generating a bunch of images. you can just
         # cat all the files in this directory after your builds finish to get
@@ -233,10 +231,10 @@ class XilinxAlveoBitBuilder(BitBuilder):
             localcap = local(
                 f"{self.build_config.post_build_hook} {local_results_dir}", capture=True
             )
-            rootLogger.debug("[localhost] " + str(localcap))
-            rootLogger.debug("[localhost] " + str(localcap.stderr))
+            logging.debug("[localhost] " + str(localcap))
+            logging.debug("[localhost] " + str(localcap.stderr))
 
-        rootLogger.info(
+        logging.info(
             f"Build complete! Xilinx Alveo {self.build_config.PLATFORM} bitstream ready. See {os.path.join(hwdb_entry_file_location,hwdb_entry_name)}."
         )
 
@@ -306,8 +304,8 @@ class XilinxVCU118BitBuilder(XilinxAlveoBitBuilder):
             extra_opts="-L",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
         rsync_cap = rsync_project(
             local_dir=f"{local_alveo_dir}/{fpga_build_postfix}/",
             remote_dir=f"{dest_alveo_dir}/{fpga_build_postfix}",
@@ -315,8 +313,8 @@ class XilinxVCU118BitBuilder(XilinxAlveoBitBuilder):
             extra_opts="-L",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         return f"{dest_alveo_dir}/{fpga_build_postfix}"
 
@@ -362,8 +360,8 @@ class RHSResearchNitefuryIIBitBuilder(XilinxAlveoBitBuilder):
             extra_opts="-L",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
         rsync_cap = rsync_project(
             local_dir=f"{local_alveo_dir}/{fpga_build_postfix}/",
             remote_dir=f"{dest_alveo_dir}/{fpga_build_postfix}",
@@ -371,7 +369,7 @@ class RHSResearchNitefuryIIBitBuilder(XilinxAlveoBitBuilder):
             extra_opts="-L",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         return f"{dest_alveo_dir}/{fpga_build_postfix}"

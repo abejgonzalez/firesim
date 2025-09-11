@@ -5,6 +5,7 @@ from __future__ import annotations
 import time
 import os
 import pprint
+import absl.logging
 import logging
 import datetime
 import sys
@@ -39,8 +40,6 @@ if TYPE_CHECKING:
     from runtools.runtime_hw_config import RuntimeHWConfig
     from runtools.workload import WorkloadConfig
 
-rootLogger = logging.getLogger()
-
 
 @parallel
 def instance_liveness() -> None:
@@ -66,7 +65,7 @@ def instance_liveness() -> None:
         exit immediately.
     c) For unknown shells, print a warning and continue normally.
     """
-    rootLogger.info(
+    absl.logging.info(
         """[{}] Checking if host instance is up...""".format(env.host_string)
     )
     run("uname -a")
@@ -79,11 +78,11 @@ def instance_liveness() -> None:
     if shell_info in allowed_shells:
         return
     if shell_info in disallowed_shells:
-        rootLogger.error(
+        absl.logging.error(
             f"::ERROR:: Invalid default shell in use: {shell_info}. Allowed shells: {allowed_shells}."
         )
         sys.exit(1)
-    rootLogger.warning(
+    absl.logging.warning(
         f"::WARNING:: Unknown default shell in use: {shell_info}. Allowed shells: {allowed_shells}. You are using a default shell that has not yet been tested to correctly interpret the commands run by the FireSim manager. Proceed at your own risk. If you find that your shell works correctly, please file an issue on the FireSim repo (https://github.com/firesim/firesim/issues) so that we can add your shell to the list of known good shells."
     )
 
@@ -323,16 +322,16 @@ class FireSimTopologyWithPasses:
         )
         inst = self.run_farm.allocate_sim_host(instance_handle)
         for pipe in pipes:
-            rootLogger.info(f"add_pipe {pipe} {pipe.pipe_id_internal}")
+            absl.logging.info(f"add_pipe {pipe} {pipe.pipe_id_internal}")
             inst.add_pipe(pipe)
         for server in servers:
-            rootLogger.info(f"add_simulation {server} {server.server_id_internal}")
+            absl.logging.info(f"add_simulation {server} {server.server_id_internal}")
             inst.add_simulation(server)
 
     def collect_all_connected_nodes(
         self, server: FireSimNode, nodes: List[FireSimNode], visited: Set[FireSimNode]
     ) -> None:
-        rootLogger.info(f"collect... server {server}")
+        absl.logging.info(f"collect... server {server}")
         if server in visited:
             return
         else:
@@ -341,13 +340,13 @@ class FireSimTopologyWithPasses:
             for uplink in server.uplinks:
                 uplink_node = uplink.get_uplink_side()
                 if uplink_node not in visited:
-                    rootLogger.info(f"collect... uplink_node {uplink_node}")
+                    absl.logging.info(f"collect... uplink_node {uplink_node}")
                     nodes.append(uplink_node)
                     visited.add(uplink_node)
                 for downlink in uplink_node.downlinks:
                     downlink_node = downlink.get_downlink_side()
                     if downlink_node is not server:
-                        rootLogger.info(f"collect... downlink_node {downlink_node}")
+                        absl.logging.info(f"collect... downlink_node {downlink_node}")
                         self.collect_all_connected_nodes(downlink_node, nodes, visited)
 
     def pass_simple_networked_partitioned_host_node_mapping(self) -> None:
@@ -362,10 +361,10 @@ class FireSimTopologyWithPasses:
                 continue
             cur_node_group: List[FireSimNode] = []
             self.collect_all_connected_nodes(server, cur_node_group, visited)
-            rootLogger.info(f"cur_node_group {cur_node_group}")
+            absl.logging.info(f"cur_node_group {cur_node_group}")
             node_groups.append(cur_node_group)
 
-        rootLogger.info(f"node_groups.size {len(node_groups)}")
+        absl.logging.info(f"node_groups.size {len(node_groups)}")
 
         for nodes in node_groups:
             server_nodes: List[FireSimServerNode] = []
@@ -382,20 +381,22 @@ class FireSimTopologyWithPasses:
                     assert False, "Wrong node type"
 
             num_servers = len(server_nodes)
-            rootLogger.info(f"pass_simple_networked_part... {num_servers}")
+            absl.logging.info(f"pass_simple_networked_part... {num_servers}")
             inst_handle_for_servers = self.run_farm.get_smallest_sim_host_handle(
                 num_sims=num_servers
             )
             inst = self.run_farm.allocate_sim_host(inst_handle_for_servers)
 
             for switch in switch_nodes:
-                rootLogger.info(f"add_switch {switch} {switch.switch_id_internal}")
+                absl.logging.info(f"add_switch {switch} {switch.switch_id_internal}")
                 inst.add_switch(switch)
             for pipe in pipe_nodes:
-                rootLogger.info(f"add_pipe {pipe} {pipe.pipe_id_internal}")
+                absl.logging.info(f"add_pipe {pipe} {pipe.pipe_id_internal}")
                 inst.add_pipe(pipe)
             for server in server_nodes:
-                rootLogger.info(f"add_simulation {server} {server.server_id_internal}")
+                absl.logging.info(
+                    f"add_simulation {server} {server.server_id_internal}"
+                )
                 inst.add_simulation(server)
 
         for switch in switches:
@@ -506,7 +507,7 @@ class FireSimTopologyWithPasses:
                 hw_cfg = runtimehwconfig_lookup_fn(self.defaulthwconfig)
             elif isinstance(hw_cfg, str):
                 hw_cfg = runtimehwconfig_lookup_fn(hw_cfg)
-            rootLogger.debug(f"pass_apply_default_hwconfig, {hw_cfg}")
+            absl.logging.debug(f"pass_apply_default_hwconfig, {hw_cfg}")
             server.set_server_hardware_config(hw_cfg)
 
     def pass_apply_default_params(self) -> None:
@@ -583,7 +584,7 @@ class FireSimTopologyWithPasses:
                 resolved_cfg = server.get_resolved_server_hardware_config()
 
                 if resolved_cfg.driver_tar is not None:
-                    rootLogger.debug(
+                    absl.logging.debug(
                         f"skipping driver build because we're using {resolved_cfg.driver_tar}"
                     )
                     continue  # skip building or tarballing if we have a prebuilt one
@@ -766,12 +767,12 @@ class FireSimTopologyWithPasses:
         def screens() -> None:
             """poll on screens to make sure kill succeeded."""
             with warn_only():
-                rootLogger.info("Confirming exit...")
+                absl.logging.info("Confirming exit...")
                 # keep checking screen until it reports that there are no screens left
                 while True:
                     run("screen -wipe || true")  # wipe any potentially dead screens
                     screenoutput = run("screen -ls")
-                    rootLogger.info(f"screenoutput {screenoutput}")
+                    absl.logging.info(f"screenoutput {screenoutput}")
                     # If AutoILA is enabled, use the following condition
                     if (
                         "2 Sockets in" in screenoutput
@@ -799,7 +800,7 @@ class FireSimTopologyWithPasses:
     ) -> Optional[int]:
         platform = hwcfg.get_platform()
         quintuplet = hwcfg.get_deployquintuplet_for_config()
-        rootLogger.info(
+        absl.logging.info(
             """neighbor platform: {} quintuplet: {}""".format(platform, quintuplet)
         )
         driver_path = os.path.join("../sim/generated-src", platform, quintuplet)
@@ -808,12 +809,12 @@ class FireSimTopologyWithPasses:
         )
 
         if not os.path.exists(p2p_config_file):
-            rootLogger.info("Skipping PCIM offset setting")
+            absl.logging.info("Skipping PCIM offset setting")
             return None
 
         with open(p2p_config_file, "r") as f:
             data = yaml.safe_load(f)
-            rootLogger.info(f"p2p yaml data  {data}")
+            absl.logging.info(f"p2p yaml data  {data}")
             if data is not None:
                 for bridge_name, bridge_info in data.items():
                     cur_bridge_idx = int(bridge_name.split("_")[1])
@@ -821,7 +822,7 @@ class FireSimTopologyWithPasses:
                         cur_bridge_idx == bridge_idx
                     ):
                         return bridge_info["bufferBaseAddress"]
-        rootLogger.info(
+        absl.logging.info(
             """Could not find bridge offset for {} bridge_idx {}""".format(
                 p2p_config_file, bridge_idx
             )
@@ -844,7 +845,7 @@ class FireSimTopologyWithPasses:
             for nbidx, nnode in edges.values():
                 neighbor_hwdb = nnode.hwdb
                 neighbor_slotid = pidx_to_slotid[nnode.pidx]
-                rootLogger.info(
+                absl.logging.info(
                     """neighbor slot: {} hwdb: {} bridge: {}""".format(
                         neighbor_slotid, neighbor_hwdb, nbidx
                     )
@@ -858,7 +859,7 @@ class FireSimTopologyWithPasses:
                     partition_config.add_pcim_slot_offset(
                         neighbor_slotid, bridge_offset_opt
                     )
-            rootLogger.info(
+            absl.logging.info(
                 """pcim slotid bridgeoffset pairs for {}: {}""".format(
                     partition_config.get_hwdb(), partition_config.pcim_slot_offset
                 )
@@ -872,23 +873,23 @@ class FireSimTopologyWithPasses:
             x.get_host() for x in self.run_farm.get_all_bound_host_nodes()
         ]
 
-        rootLogger.info(
+        absl.logging.info(
             """Creating the directory: {}""".format(self.workload.job_results_dir)
         )
         localcap = local(
             """mkdir -p {}""".format(self.workload.job_results_dir), capture=True
         )
-        rootLogger.debug("[localhost] " + str(localcap))
-        rootLogger.debug("[localhost] " + str(localcap.stderr))
+        absl.logging.debug("[localhost] " + str(localcap))
+        absl.logging.debug("[localhost] " + str(localcap.stderr))
 
-        rootLogger.debug(
+        absl.logging.debug(
             """Creating the directory: {}""".format(self.workload.job_monitoring_dir)
         )
         localcap = local(
             """mkdir -p {}""".format(self.workload.job_monitoring_dir), capture=True
         )
-        rootLogger.debug("[localhost] " + str(localcap))
-        rootLogger.debug("[localhost] " + str(localcap.stderr))
+        absl.logging.debug("[localhost] " + str(localcap))
+        absl.logging.debug("[localhost] " + str(localcap.stderr))
 
         # Setup partition configs
         with TemporaryDirectory() as uridir:
@@ -987,41 +988,49 @@ class FireSimTopologyWithPasses:
             longestsim = max([len(e["hostip"]) for e in simstates], default=15)
 
             # clear the screen
-            rootLogger.info("\033[2J")
-            rootLogger.info(
+            absl.logging.info("\033[2J")
+            absl.logging.info(
                 """FireSim Simulation Status @ {}""".format(
                     str(datetime.datetime.utcnow())
                 )
             )
-            rootLogger.info("-" * 80)
-            rootLogger.info(
+            absl.logging.info("-" * 80)
+            absl.logging.info(
                 """This workload's output is located in:\n{}""".format(
                     self.workload.job_results_dir
                 )
             )
-            assert isinstance(rootLogger.handlers[0], logging.FileHandler)
-            rootLogger.info(
+            file_handler = next(
+                (
+                    h
+                    for h in logging.root.handlers
+                    if isinstance(h, logging.FileHandler)
+                ),
+                None,
+            )
+            assert file_handler is not None
+            absl.logging.info(
                 """This run's log is located in:\n{}""".format(
-                    rootLogger.handlers[0].baseFilename
+                    file_handler.baseFilename
                 )
             )
-            rootLogger.info("""This status will update every 10s.""")
-            rootLogger.info("-" * 80)
-            rootLogger.info("Instances")
-            rootLogger.info("-" * 80)
+            absl.logging.info("""This status will update every 10s.""")
+            absl.logging.info("-" * 80)
+            absl.logging.info("Instances")
+            absl.logging.info("-" * 80)
             for instance in instancestate_map.keys():
-                rootLogger.info(
+                absl.logging.info(
                     """Hostname/IP: {:>{}} | Terminated: {}""".format(
                         instance,
                         longestinst,
                         truefalsecolor[instancestate_map[instance]],
                     )
                 )
-            rootLogger.info("-" * 80)
-            rootLogger.info("Simulated Switches")
-            rootLogger.info("-" * 80)
+            absl.logging.info("-" * 80)
+            absl.logging.info("Simulated Switches")
+            absl.logging.info("-" * 80)
             for switchinfo in switchstates:
-                rootLogger.info(
+                absl.logging.info(
                     """Hostname/IP: {:>{}} | Switch name: {} | Switch running: {}""".format(
                         switchinfo["hostip"],
                         longestswitch,
@@ -1029,11 +1038,11 @@ class FireSimTopologyWithPasses:
                         truefalsecolor[switchinfo["running"]],
                     )
                 )
-            rootLogger.info("-" * 80)
-            rootLogger.info("Simulated Pipes")
-            rootLogger.info("-" * 80)
+            absl.logging.info("-" * 80)
+            absl.logging.info("Simulated Pipes")
+            absl.logging.info("-" * 80)
             for pipeinfo in pipestates:
-                rootLogger.info(
+                absl.logging.info(
                     """Hostname/IP: {:>{}} | Pipe name: {} | Pipe running: {}""".format(
                         pipeinfo["hostip"],
                         longestpipe,
@@ -1041,11 +1050,11 @@ class FireSimTopologyWithPasses:
                         truefalsecolor[pipeinfo["running"]],
                     )
                 )
-            rootLogger.info("-" * 80)
-            rootLogger.info("Simulated Nodes/Jobs")
-            rootLogger.info("-" * 80)
+            absl.logging.info("-" * 80)
+            absl.logging.info("Simulated Nodes/Jobs")
+            absl.logging.info("-" * 80)
             for siminfo in simstates:
-                rootLogger.info(
+                absl.logging.info(
                     """Hostname/IP: {:>{}} | Job: {} | Sim running: {}""".format(
                         siminfo["hostip"],
                         longestsim,
@@ -1053,20 +1062,20 @@ class FireSimTopologyWithPasses:
                         inverttruefalsecolor[siminfo["running"]],
                     )
                 )
-            rootLogger.info("-" * 80)
-            rootLogger.info("Summary")
-            rootLogger.info("-" * 80)
-            rootLogger.info(
+            absl.logging.info("-" * 80)
+            absl.logging.info("Summary")
+            absl.logging.info("-" * 80)
+            absl.logging.info(
                 """{}/{} instances are still running.""".format(
                     runninginsts, totalinsts
                 )
             )
-            rootLogger.info(
+            absl.logging.info(
                 """{}/{} simulations are still running.""".format(
                     runningsims, totalsims
                 )
             )
-            rootLogger.info("-" * 80)
+            absl.logging.info("-" * 80)
 
         servers = self.firesimtopol.get_dfs_order_servers()
         is_partitioned = False
@@ -1088,7 +1097,7 @@ class FireSimTopologyWithPasses:
                 # this is a list of jobs completed, since any completed job will have
                 # a directory within this directory.
                 monitored_jobs_completed = os.listdir(self.workload.job_monitoring_dir)
-                rootLogger.debug(
+                absl.logging.debug(
                     f"Monitoring dir jobs completed: {monitored_jobs_completed}"
                 )
                 return monitored_jobs_completed
@@ -1108,7 +1117,7 @@ class FireSimTopologyWithPasses:
             )
 
             # log sim state, raw
-            rootLogger.debug(pprint.pformat(instancestates))
+            absl.logging.debug(pprint.pformat(instancestates))
 
             # log sim state, properly
             loop_logger(instancestates, self.terminateoncompletion)
@@ -1118,14 +1127,14 @@ class FireSimTopologyWithPasses:
             for x in simstates:
                 jobs_complete_dict.update(x)
             global_status = jobs_complete_dict.values()
-            rootLogger.debug(f"Jobs complete: {jobs_complete_dict}")
-            rootLogger.debug(f"Global status: {global_status}")
+            absl.logging.debug(f"Jobs complete: {jobs_complete_dict}")
+            absl.logging.debug(f"Global status: {global_status}")
 
             if is_networked and any(global_status):
                 # at least one simulation has finished
 
                 # in this case, do the teardown, then call exec again, then exit
-                rootLogger.info(
+                absl.logging.info(
                     "Networked simulation, manually tearing down all instances..."
                 )
                 # do not disconnect nbds, because we may need them for copying
@@ -1134,7 +1143,7 @@ class FireSimTopologyWithPasses:
                     use_mock_instances_for_testing, disconnect_all_nbds=False
                 )
 
-                rootLogger.debug("One more loop to fully copy results and terminate.")
+                absl.logging.debug("One more loop to fully copy results and terminate.")
                 is_final_run = True
                 monitored_jobs_completed = get_jobs_completed_local_info()
                 instancestates = execute(
@@ -1156,7 +1165,7 @@ class FireSimTopologyWithPasses:
 
         # run post-workload hook, if one exists
         if self.workload.post_run_hook is not None:
-            rootLogger.info("Running post_run_hook...")
+            absl.logging.info("Running post_run_hook...")
             localcap = local(
                 """cd {} && {} {}""".format(
                     self.workload.workload_input_base_dir,
@@ -1165,10 +1174,10 @@ class FireSimTopologyWithPasses:
                 ),
                 capture=True,
             )
-            rootLogger.debug("[localhost] " + str(localcap))
-            rootLogger.debug("[localhost] " + str(localcap.stderr))
+            absl.logging.debug("[localhost] " + str(localcap))
+            absl.logging.debug("[localhost] " + str(localcap.stderr))
 
-        rootLogger.info(
+        absl.logging.info(
             "FireSim Simulation Exited Successfully. See results in:\n"
             + str(self.workload.job_results_dir)
         )

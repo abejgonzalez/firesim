@@ -1,9 +1,7 @@
 from pathlib import Path
-import logging
+from absl import logging
 
 from typing import Optional
-
-rootLogger = logging.getLogger()
 
 
 def extra_target_project_make_args(
@@ -23,7 +21,7 @@ def extra_target_project_make_args(
     if targetprojectmakefrag:
         p = Path(targetprojectmakefrag)
         if p.exists():
-            rootLogger.debug(f"Using makefrag path given: {p}")
+            logging.debug(f"Using makefrag path given: {p}")
             return f"TARGET_PROJECT_MAKEFRAG={targetprojectmakefrag}"
         else:
             raise Exception(f"Invalid makefrag path given: {targetprojectmakefrag}")
@@ -31,7 +29,7 @@ def extra_target_project_make_args(
         chipyard_dir = (
             f"{deploydir}/../../.."  # assumes firesim is a library inside of chipyard
         )
-        rootLogger.debug(
+        logging.debug(
             f"Having manager assume makefrag path from hardcoded Chipyard dir: {chipyard_dir}"
         )
         if targetproject == "firesim":

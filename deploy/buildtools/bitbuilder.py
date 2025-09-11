@@ -2,7 +2,7 @@ from __future__ import with_statement, annotations
 
 import abc
 import yaml
-import logging
+from absl import logging
 from fabric.api import prefix, local, run, env, lcd, parallel, settings  # type: ignore
 from fabric.contrib.console import confirm  # type: ignore
 from fabric.contrib.project import rsync_project  # type: ignore
@@ -26,8 +26,6 @@ from typing import Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from buildtools.build_config import BuildConfig
-
-rootLogger = logging.getLogger()
 
 
 class BitBuilder(metaclass=abc.ABCMeta):
@@ -57,7 +55,7 @@ class BitBuilder(metaclass=abc.ABCMeta):
 
     def replace_rtl(self) -> None:
         """Generate Verilog from build config. Should run on the manager host."""
-        rootLogger.info(
+        logging.info(
             f"Building Verilog for {self.build_config.get_chisel_quintuplet()}"
         )
 
@@ -73,7 +71,7 @@ class BitBuilder(metaclass=abc.ABCMeta):
 
     def build_driver(self) -> None:
         """Build FireSim FPGA driver from build config. Should run on the manager host."""
-        rootLogger.info(
+        logging.info(
             f"Building FPGA driver for {self.build_config.get_chisel_quintuplet()}"
         )
 

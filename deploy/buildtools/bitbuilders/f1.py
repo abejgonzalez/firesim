@@ -5,7 +5,7 @@ import json
 import time
 import random
 import string
-import logging
+from absl import logging
 import os
 from fabric.api import prefix, local, run, env, lcd, parallel, settings  # type: ignore
 from fabric.contrib.console import confirm  # type: ignore
@@ -31,8 +31,6 @@ from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from buildtools.build_config import BuildConfig
-
-rootLogger = logging.getLogger()
 
 
 class F1BitBuilder(BitBuilder):
@@ -97,8 +95,8 @@ class F1BitBuilder(BitBuilder):
             extra_opts="-l",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
         rsync_cap = rsync_project(
             local_dir=f"{local_awsfpga_dir}/{fpga_build_postfix}/*",
             remote_dir=f"{dest_awsfpga_dir}/{fpga_build_postfix}",
@@ -107,8 +105,8 @@ class F1BitBuilder(BitBuilder):
             extra_opts="-l",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         return f"{dest_awsfpga_dir}/{fpga_build_postfix}"
 
@@ -140,12 +138,12 @@ class F1BitBuilder(BitBuilder):
 
             send_firesim_notification(message_title, message_body)
 
-            rootLogger.info(message_title)
-            rootLogger.info(message_body)
+            logging.info(message_title)
+            logging.info(message_body)
 
             build_farm.release_build_host(self.build_config)
 
-        rootLogger.info("Building AWS F1 AGFI from Verilog")
+        logging.info("Building AWS F1 AGFI from Verilog")
 
         local_deploy_dir = get_deploy_dir()
         fpga_build_postfix = (
@@ -171,8 +169,8 @@ class F1BitBuilder(BitBuilder):
             extra_opts="-l",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         # get the frequency and strategy
         fpga_frequency = self.build_config.get_frequency()
@@ -185,9 +183,9 @@ class F1BitBuilder(BitBuilder):
             vivado_rc = vivado_result.return_code
 
             if vivado_result != 0:
-                rootLogger.info("Printing error output:")
+                logging.info("Printing error output:")
                 for line in vivado_result.splitlines()[-100:]:
-                    rootLogger.info(line)
+                    logging.info(line)
 
         # put build results in the result-build area
 
@@ -199,8 +197,8 @@ class F1BitBuilder(BitBuilder):
             extra_opts="-l",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         if vivado_rc != 0:
             on_build_failure()
@@ -252,30 +250,30 @@ class F1BitBuilder(BitBuilder):
             f"{local_results_dir}/cl_{self.build_config.get_chisel_quintuplet()}/build/checkpoints/to_aws/"
         ):
             files = local("ls *.tar", capture=True)
-            rootLogger.debug(files)
-            rootLogger.debug(files.stderr)
+            logging.debug(files)
+            logging.debug(files.stderr)
             tarfile = files.split()[-1]
             s3_tarfile = tarfile + global_append
             localcap = local(
                 "aws s3 cp " + tarfile + " s3://" + s3bucket + "/dcp/" + s3_tarfile,
                 capture=True,
             )
-            rootLogger.debug(localcap)
-            rootLogger.debug(localcap.stderr)
+            logging.debug(localcap)
+            logging.debug(localcap.stderr)
             agfi_afi_ids = local(
                 f"""aws ec2 create-fpga-image --input-storage-location Bucket={s3bucket},Key={"dcp/" + s3_tarfile} --logs-storage-location Bucket={s3bucket},Key={"logs/"} --name "{afiname}" --description "{description}" """,
                 capture=True,
             )
-            rootLogger.debug(agfi_afi_ids)
-            rootLogger.debug(agfi_afi_ids.stderr)
-            rootLogger.debug("create-fpge-image result: " + str(agfi_afi_ids))
+            logging.debug(agfi_afi_ids)
+            logging.debug(agfi_afi_ids.stderr)
+            logging.debug("create-fpge-image result: " + str(agfi_afi_ids))
             ids_as_dict = json.loads(agfi_afi_ids)
             agfi = ids_as_dict["FpgaImageGlobalId"]
             afi = ids_as_dict["FpgaImageId"]
-            rootLogger.info("Resulting AGFI: " + str(agfi))
-            rootLogger.info("Resulting AFI: " + str(afi))
+            logging.info("Resulting AGFI: " + str(agfi))
+            logging.info("Resulting AFI: " + str(afi))
 
-        rootLogger.info("Waiting for create-fpga-image completion.")
+        logging.info("Waiting for create-fpga-image completion.")
         checkstate = "pending"
         with lcd(local_results_dir):
             while checkstate == "pending":
@@ -285,7 +283,7 @@ class F1BitBuilder(BitBuilder):
                 )
                 state_as_dict = json.loads(imagestate)
                 checkstate = state_as_dict["FpgaImages"][0]["State"]["Code"]
-                rootLogger.info("Current state: " + str(checkstate))
+                logging.info("Current state: " + str(checkstate))
                 time.sleep(10)
 
         if checkstate == "available":
@@ -305,8 +303,8 @@ class F1BitBuilder(BitBuilder):
 
             send_firesim_notification(message_title, message_body)
 
-            rootLogger.info(message_title)
-            rootLogger.info(message_body)
+            logging.info(message_title)
+            logging.info(message_body)
 
             # for convenience when generating a bunch of images. you can just
             # cat all the files in this directory after your builds finish to get
@@ -321,10 +319,10 @@ class F1BitBuilder(BitBuilder):
                     f"{self.build_config.post_build_hook} {local_results_dir}",
                     capture=True,
                 )
-                rootLogger.debug("[localhost] " + str(localcap))
-                rootLogger.debug("[localhost] " + str(localcap.stderr))
+                logging.debug("[localhost] " + str(localcap))
+                logging.debug("[localhost] " + str(localcap.stderr))
 
-            rootLogger.info(
+            logging.info(
                 f"Build complete! AFI ready. See {os.path.join(hwdb_entry_file_location,afiname)}."
             )
             return True

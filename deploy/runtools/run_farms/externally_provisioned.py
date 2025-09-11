@@ -1,22 +1,26 @@
 from __future__ import annotations
 
-import logging
+from absl import logging
 import pprint
 from collections import defaultdict
 
 from utils.inheritors import inheritors
 from runtools.instance_deploy_manager import InstanceDeployManager
 from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
-from runtools.instance_deploy_managers.xilinx_alveo import XilinxAlveoU200InstanceDeployManager, XilinxAlveoU250InstanceDeployManager, XilinxAlveoU280InstanceDeployManager
-from runtools.instance_deploy_managers.xilinx_vcu118 import XilinxVCU118InstanceDeployManager
+from runtools.instance_deploy_managers.xilinx_alveo import (
+    XilinxAlveoU200InstanceDeployManager,
+    XilinxAlveoU250InstanceDeployManager,
+    XilinxAlveoU280InstanceDeployManager,
+)
+from runtools.instance_deploy_managers.xilinx_vcu118 import (
+    XilinxVCU118InstanceDeployManager,
+)
 from runtools.run_farm import RunFarm, RunHost
 
 from typing import Any, Dict, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     pass
-
-rootLogger = logging.getLogger()
 
 
 class ExternallyProvisioned(RunFarm):
@@ -107,7 +111,7 @@ class ExternallyProvisioned(RunFarm):
         return
 
     def launch_run_farm(self) -> None:
-        rootLogger.info(
+        logging.info(
             f"WARNING: Skipping launchrunfarm since run hosts are externally provisioned."
         )
         return
@@ -115,7 +119,7 @@ class ExternallyProvisioned(RunFarm):
     def terminate_run_farm(
         self, terminate_some_dict: Dict[str, int], forceterminate: bool
     ) -> None:
-        rootLogger.info(
+        logging.info(
             f"WARNING: Skipping terminaterunfarm since run hosts are externally provisioned."
         )
         return
@@ -138,7 +142,7 @@ class ExternallyProvisioned(RunFarm):
         assert False, f"Unable to find host node by {host} host name"
 
     def terminate_by_inst(self, inst: RunHost) -> None:
-        rootLogger.info(
+        logging.info(
             f"WARNING: Skipping terminate_by_inst since run hosts are externally provisioned."
         )
         return

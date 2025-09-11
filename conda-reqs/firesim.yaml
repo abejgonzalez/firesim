@@ -102,7 +102,6 @@ dependencies:
     # conda and create broken environments.  It's best to use the conda
     # packages so that the environment is consistent
     - colorama
-    - argcomplete
     - absl-py
     - python-graphviz
     - pyparsing

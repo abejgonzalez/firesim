@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import logging
+from absl import logging
 import os
 from datetime import timedelta
 from collections import defaultdict
@@ -30,8 +30,6 @@ from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
 
 if TYPE_CHECKING:
     from runtools.topology.elements import FireSimSwitchNode, FireSimServerNode
-
-rootLogger = logging.getLogger()
 
 
 class AWSEC2F1(RunFarm):
@@ -199,11 +197,11 @@ class AWSEC2F1(RunFarm):
                 len(available_instances_per_handle[sim_host_handle])
                 >= len(self.run_farm_hosts_dict[sim_host_handle])
             ):
-                rootLogger.warning(message.format(sim_host_handle))
+                logging.warning(message.format(sim_host_handle))
 
         ipmessage = """Using {} instances with IPs:\n{}"""
         for sim_host_handle in sorted(self.SIM_HOST_HANDLE_TO_MAX_FPGA_SLOTS):
-            rootLogger.debug(
+            logging.debug(
                 ipmessage.format(
                     sim_host_handle,
                     str(
@@ -275,7 +273,7 @@ class AWSEC2F1(RunFarm):
         if len(not_allowed_handles) != 0:
             # the terminatesome logic becomes messy if you have invalid instance
             # handles specified, so just exit and indicate error
-            rootLogger.critical(
+            logging.fatal(
                 "WARNING: You have requested --terminatesome for the following invalid instance handles. Nothing has been terminated.\n"
                 + str(not_allowed_handles)
             )
@@ -310,10 +308,10 @@ class AWSEC2F1(RunFarm):
                 else:
                     all_instance_ids[sim_host_handle] = []
 
-        rootLogger.critical("IMPORTANT!: This will terminate the following instances:")
+        logging.fatal("IMPORTANT!: This will terminate the following instances:")
         for sim_host_handle in sorted(self.SIM_HOST_HANDLE_TO_MAX_FPGA_SLOTS):
-            rootLogger.critical(sim_host_handle)
-            rootLogger.critical(all_instance_ids[sim_host_handle])
+            logging.fatal(sim_host_handle)
+            logging.fatal(all_instance_ids[sim_host_handle])
 
         if not forceterminate:
             # --forceterminate was not supplied, so confirm with the user
@@ -327,11 +325,11 @@ class AWSEC2F1(RunFarm):
             for sim_host_handle in sorted(self.SIM_HOST_HANDLE_TO_MAX_FPGA_SLOTS):
                 if len(all_instance_ids[sim_host_handle]) != 0:
                     terminate_instances(all_instance_ids[sim_host_handle], False)
-            rootLogger.critical(
+            logging.fatal(
                 "Instances terminated. Please confirm in your AWS Management Console."
             )
         else:
-            rootLogger.critical("Termination cancelled.")
+            logging.fatal("Termination cancelled.")
 
     def get_all_host_nodes(self) -> List[RunHost]:
         all_insts = []

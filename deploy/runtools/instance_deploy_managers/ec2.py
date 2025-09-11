@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import logging
+from absl import logging
 from fabric.api import prefix, local, run, cd, warn_only, put, settings  # type: ignore
 import os
 
@@ -13,8 +13,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.run_farm import RunHost
-
-rootLogger = logging.getLogger()
 
 
 class EC2InstanceDeployManager(InstanceDeployManager):
@@ -45,7 +43,7 @@ class EC2InstanceDeployManager(InstanceDeployManager):
                     capture=True,
                 )
                 if "-dirty" in aws_fpga_upstream_version:
-                    rootLogger.critical(
+                    logging.fatal(
                         "Unable to use local changes to aws-fpga. Continuing without them."
                     )
             self.instance_logger(

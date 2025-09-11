@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import logging
+from absl import logging
 import yaml
 import pprint
 from absl import flags
@@ -20,7 +20,6 @@ from utils.deepmerge import deep_merge
 
 from typing import Optional
 
-rootLogger = logging.getLogger()
 FLAGS = flags.FLAGS
 
 
@@ -66,9 +65,9 @@ class InnerRuntimeConfiguration:
             overridesection = configoverrideval[0]
             overridefield = configoverrideval[1]
             overridevalue = configoverrideval[2]
-            rootLogger.warning("Overriding part of the runtime config with: ")
-            rootLogger.warning(f'"[{overridesection}]"')
-            rootLogger.warning(f"{overridefield}={overridevalue}")
+            logging.warning("Overriding part of the runtime config with: ")
+            logging.warning(f'"[{overridesection}]"')
+            logging.warning(f"{overridefield}={overridevalue}")
             runtime_dict[overridesection][overridefield] = overridevalue
 
         def dict_assert(key_check, dict_name):

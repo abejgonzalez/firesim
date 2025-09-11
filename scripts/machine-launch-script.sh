@@ -241,7 +241,6 @@ set -o pipefail
         vim \
         git \
         screen \
-        argcomplete \
         expect \
         "python>=3.8" \
         boto3 \

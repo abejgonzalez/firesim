@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import logging
+from absl import logging
 import json
 import os
 from pathlib import Path
@@ -18,8 +18,6 @@ from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.run_farm import RunHost
-
-rootLogger = logging.getLogger()
 
 
 class XilinxAlveoInstanceDeployManager(InstanceDeployManager):
@@ -96,8 +94,8 @@ class XilinxAlveoInstanceDeployManager(InstanceDeployManager):
                     extra_opts="-L -p",
                     capture=True,
                 )
-                rootLogger.debug(rsync_cap)
-                rootLogger.debug(rsync_cap.stderr)
+                logging.debug(rsync_cap)
+                logging.debug(rsync_cap.stderr)
 
                 json_db = self.parent_node.get_fpga_db()
                 bdf = self.slot_to_bdf(slotno, json_db)
@@ -207,8 +205,8 @@ class XilinxAlveoInstanceDeployManager(InstanceDeployManager):
                 extra_opts="-L",
                 capture=True,
             )
-            rootLogger.debug(rsync_cap)
-            rootLogger.debug(rsync_cap.stderr)
+            logging.debug(rsync_cap)
+            logging.debug(rsync_cap.stderr)
 
         run(f"cp -r {remote_sim_rsync_dir}/* {remote_sim_dir}/", shell=True)
 
@@ -219,8 +217,8 @@ class XilinxAlveoInstanceDeployManager(InstanceDeployManager):
             extra_opts="-L -p",
             capture=True,
         )
-        rootLogger.debug(rsync_cap)
-        rootLogger.debug(rsync_cap.stderr)
+        logging.debug(rsync_cap)
+        logging.debug(rsync_cap.stderr)
 
         bitstream_tar = hwcfg.get_bitstream_tar_filename()
         bitstream_tar_unpack_dir = f"{remote_sim_dir}/{self.PLATFORM_NAME}"

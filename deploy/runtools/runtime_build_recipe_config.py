@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import logging
+from absl import logging
 
 from runtools.runtime_hw_config import RuntimeHWConfig, LOCAL_DRIVERS_GENERATED_SRC
 from utils.targetprojectutils import resolve_path
@@ -14,8 +14,6 @@ if TYPE_CHECKING:
     from runtools.simulation_configs.host_debug import HostDebugConfig
     from runtools.simulation_configs.synth_print import SynthPrintConfig
     from runtools.simulation_configs.partition import PartitionConfig
-
-rootLogger = logging.getLogger()
 
 
 class RuntimeBuildRecipeConfig(RuntimeHWConfig):

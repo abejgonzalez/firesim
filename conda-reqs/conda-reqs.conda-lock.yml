@@ -13,7 +13,7 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: 409434d94dd95325806265ce9b928819ff44330e0a20cbbbc93d73abecf86c49
+    linux-64: e8439bc9cf7cb0e18f4aec308ac74f70f953d9dfd5833e33adafe0b4560d6624
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -187,18 +187,6 @@ package:
   hash:
     md5: 845b38297fca2f2d18a29748e2ece7fa
     sha256: eb68e1ce9e9a148168a4b1e257a8feebffdb0664b557bb526a1e4853f2d2fc00
-  category: main
-  optional: false
-- name: argcomplete
-  version: 3.6.2
-  manager: conda
-  platform: linux-64
-  dependencies:
-    python: '>=3.9'
-  url: https://conda.anaconda.org/conda-forge/noarch/argcomplete-3.6.2-pyhd8ed1ab_0.conda
-  hash:
-    md5: eb9d4263271ca287d2e0cf5a86da2d3a
-    sha256: 66ffcf30550e0788d16090e4b4e8835290b15439bb454b0e217176a09dc1d500
   category: main
   optional: false
 - name: async-timeout

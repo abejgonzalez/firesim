@@ -1,4 +1,4 @@
-import logging
+from absl import logging
 import os
 import pprint
 
@@ -14,10 +14,8 @@ from buildtools.build_hosts.ec2 import EC2BuildHost
 from buildtools.build_config import BuildConfig
 
 # imports needed for python type checking
-from typing import cast, Any, Dict, TYPE_CHECKING
+from typing import cast, Any, Dict
 from mypy_boto3_ec2.service_resource import Instance as EC2InstanceResource
-
-rootLogger = logging.getLogger()
 
 
 class AWSEC2(BuildFarm):
@@ -128,7 +126,7 @@ class AWSEC2(BuildFarm):
         instance_ids = get_instance_ids_for_instances(
             [build_host.launched_instance_object]
         )
-        rootLogger.info(
+        logging.info(
             f"Terminating build instance {instance_ids}. Please confirm in your AWS Management Console"
         )
         terminate_instances(instance_ids, dryrun=False)

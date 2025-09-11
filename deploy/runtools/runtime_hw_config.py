@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import logging
+from absl import logging
 import os
 import sys
 from pathlib import Path
@@ -31,7 +31,6 @@ if TYPE_CHECKING:
     from runtools.simulation_configs.synth_print import SynthPrintConfig
     from runtools.simulation_configs.partition import PartitionConfig
 
-rootLogger = logging.getLogger()
 
 LOCAL_DRIVERS_BASE = "../sim/output"
 LOCAL_DRIVERS_GENERATED_SRC = "../sim/generated-src"
@@ -109,12 +108,12 @@ class RuntimeHWConfig:
             "deploy_triplet_override" in hwconfig_dict.keys()
             and "deploy_quintuplet_override" in hwconfig_dict.keys()
         ):
-            rootLogger.error(
+            logging.error(
                 "Cannot have both 'deploy_quintuplet_override' and 'deploy_triplet_override' in hwdb entry. Define only 'deploy_quintuplet_override'."
             )
             sys.exit(1)
         elif "deploy_triplet_override" in hwconfig_dict.keys():
-            rootLogger.warning(
+            logging.warning(
                 "Please rename your 'deploy_triplet_override' key in your hwdb entry to 'deploy_quintuplet_override'. Support for 'deploy_triplet_override' will be removed in the future."
             )
 
@@ -138,14 +137,14 @@ class RuntimeHWConfig:
 
         self.deploy_quintuplet = hwconfig_override_build_quintuplet
         if self.deploy_quintuplet is not None:
-            rootLogger.warning(
+            logging.warning(
                 f"{name} is overriding a deploy quintuplet in your config_hwdb.yaml file. Make sure you understand why!"
             )
 
         hwconfig_override_build_makefrag = hwconfig_dict.get("deploy_makefrag_override")
         self.deploy_makefrag = hwconfig_override_build_makefrag
         if self.deploy_makefrag is not None:
-            rootLogger.warning(
+            logging.warning(
                 f"{name} is overriding a deploy makefrag in your config_hwdb.yaml file. Make sure you understand why!"
             )
 
@@ -154,7 +153,7 @@ class RuntimeHWConfig:
         self.additional_required_files = []
 
         self.uri_list.append(URIContainer("driver_tar", self.get_driver_tar_filename()))
-        rootLogger.debug(f"RuntimeHWConfig self.platform {self.platform}")
+        logging.debug(f"RuntimeHWConfig self.platform {self.platform}")
 
     def get_deploytriplet_for_config(self) -> str:
         """Get the deploytriplet for this configuration."""
@@ -206,14 +205,14 @@ class RuntimeHWConfig:
     def get_deployquintuplet_for_config(self) -> str:
         """Get the deployquintuplet for this configuration. This memoizes the request
         to the AWS AGFI API."""
-        rootLogger.debug(
+        logging.debug(
             f"get_deployquintuplet_for_config {self.deploy_quintuplet} {self.get_platform}"
         )
         if self.deploy_quintuplet is not None:
             return self.deploy_quintuplet
 
         if self.get_platform() == "f1":
-            rootLogger.debug(
+            logging.debug(
                 "Setting deployquintuplet by querying the AGFI's description."
             )
             self.deploy_quintuplet = get_firesim_deploy_quintuplet_for_agfi(self.agfi)
@@ -253,9 +252,7 @@ class RuntimeHWConfig:
     def get_local_driver_dir(self) -> str:
         """Get the relative local directory that contains the driver used to
         run this sim."""
-        rootLogger.info(
-            f"get_local_driver_dir {self.get_deployquintuplet_for_config()}"
-        )
+        logging.info(f"get_local_driver_dir {self.get_deployquintuplet_for_config()}")
         return (
             self.local_driver_base_dir
             + "/"
@@ -463,10 +460,10 @@ class RuntimeHWConfig:
     ) -> None:
         """A helper function for a nice error message when used in conjunction with the run() function"""
         if buildresult.failed:
-            rootLogger.info(
+            logging.info(
                 f"{self.driver_type_message} {what} failed. Exiting. See log for details."
             )
-            rootLogger.info(
+            logging.info(
                 f"\nYou can also re-run '{cmd}' in the '{dir}' directory to debug this error."
             )
             sys.exit(1)
@@ -521,7 +518,7 @@ class RuntimeHWConfig:
                     deploy_makefrag = metadata.get(
                         "firesim-deploymakefrag", "None"
                     )  # support old metadatas that don't have this
-                    rootLogger.debug(f"Got {deploy_makefrag} from metadata")
+                    logging.debug(f"Got {deploy_makefrag} from metadata")
                     self.set_deploy_makefrag(
                         deploy_makefrag if deploy_makefrag != "None" else None
                     )
@@ -539,7 +536,7 @@ class RuntimeHWConfig:
         if target_split_fpga_idx.isnumeric():
             return int(target_split_fpga_idx)
         else:
-            rootLogger.warning(f"FPGA index {target_split_fpga_idx} is not a number")
+            logging.warning(f"FPGA index {target_split_fpga_idx} is not a number")
             return self.get_partition_fpga_cnt() - 1
 
     def build_sim_driver(self) -> None:
@@ -555,7 +552,7 @@ class RuntimeHWConfig:
         design = quintuplet_pieces[2]
         target_config = quintuplet_pieces[3]
         platform_config = quintuplet_pieces[4]
-        rootLogger.info(
+        logging.info(
             f"Building {self.driver_type_message} driver for {str(self.get_deployquintuplet_for_config())}"
         )
 

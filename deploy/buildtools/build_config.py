@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto
 import sys
-import logging
+from absl import logging
 
 import pprint
 import yaml
@@ -18,8 +18,6 @@ from typing import Any, Optional, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from buildtools.build_config_file import BuildConfigFile
-
-rootLogger = logging.getLogger()
 
 
 class InvalidBuildConfigSetting(Exception):
@@ -121,12 +119,12 @@ class BuildConfig:
             "deploy_triplet" in recipe_config_dict.keys()
             and "deploy_quintuplet" in recipe_config_dict.keys()
         ):
-            rootLogger.error(
+            logging.error(
                 "Cannot have both 'deploy_quintuplet' and 'deploy_triplet' in build config. Define only 'deploy_quintuplet'."
             )
             sys.exit(1)
         elif "deploy_triplet" in recipe_config_dict.keys():
-            rootLogger.warning(
+            logging.warning(
                 "Please rename your 'deploy_triplet' key in your build config to 'deploy_quintuplet'. Support for 'deploy_triplet' will be removed in the future."
             )
 

@@ -1,14 +1,11 @@
-import logging
+from absl import logging
 import pprint
 
 from buildtools.build_farm import BuildHost, BuildFarm
 from buildtools.build_config import BuildConfig
 
 # imports needed for python type checking
-from typing import Any, Dict, TYPE_CHECKING
-
-
-rootLogger = logging.getLogger()
+from typing import Any, Dict
 
 
 class ExternallyProvisioned(BuildFarm):
@@ -83,7 +80,7 @@ class ExternallyProvisioned(BuildFarm):
         else:
             bcf = build_config.build_config_file
             error_msg = f"ERROR: {bcf.num_builds} builds requested in `config_build.yaml` but {self.__class__.__name__} build farm only provides {len(self.build_hosts)} build hosts (i.e. IPs)."
-            rootLogger.critical(error_msg)
+            logging.fatal(error_msg)
             raise Exception(error_msg)
 
         return

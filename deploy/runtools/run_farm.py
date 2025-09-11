@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import logging
+from absl import logging
 import abc
 import os
 
@@ -18,8 +18,6 @@ from runtools.topology.elements import (
 if TYPE_CHECKING:
     from awstools.awstools import MockBoto3Instance
     from runtools.topology.elements import FireSimSwitchNode, FireSimServerNode
-
-rootLogger = logging.getLogger()
 
 
 class RunHost(metaclass=abc.ABCMeta):
@@ -243,14 +241,14 @@ class RunFarm(metaclass=abc.ABCMeta):
                 continue
             return sim_host_handle
 
-        rootLogger.critical(
+        logging.fatal(
             f"ERROR: No hosts are available to satisfy the request for a host with support for {num_sims} simulation slots. Add more hosts in your run farm configuration (e.g., config_runtime.yaml)."
         )
         raise Exception
 
     def allocate_sim_host(self, sim_host_handle: str) -> RunHost:
         """Let user allocate and use an run host (assign sims, etc.) given it's handle."""
-        rootLogger.info(f"run_farm_hosts_dict {self.run_farm_hosts_dict}")
+        logging.info(f"run_farm_hosts_dict {self.run_farm_hosts_dict}")
         inst_tup = self.run_farm_hosts_dict[sim_host_handle][
             self.mapper_consumed[sim_host_handle]
         ]
@@ -276,7 +274,7 @@ class RunFarm(metaclass=abc.ABCMeta):
                 continue
             return sim_host_handle
 
-        rootLogger.critical(
+        logging.fatal(
             f"ERROR: No hosts are available to satisfy the request for a host with support for running only switches. Add more hosts in your run farm configuration (e.g., config_runtime.yaml)."
         )
         raise Exception

@@ -1,4 +1,4 @@
-import logging
+from absl import logging
 from os import fspath
 from fsspec.core import url_to_fs, open_local  # type: ignore
 from pathlib import Path
@@ -16,17 +16,13 @@ def firesim_input(prompt: object = None) -> str:
     See 'streamlogger.py' and it's use at the end of 'firesim.py'
     """
 
-    rootLogger = logging.getLogger()
     if prompt:
-        rootLogger.critical(prompt)
+        logging.fatal(prompt)
 
     res = input()
-    rootLogger.debug("User Provided input():'%s'", res)
+    logging.debug("User Provided input():'%s'", res)
 
     return res
-
-
-rootLogger = logging.getLogger()
 
 
 def downloadURI(uri: str, local_dest_path: str, tries: int = 4) -> None:
@@ -46,14 +42,12 @@ def downloadURI(uri: str, local_dest_path: str, tries: int = 4) -> None:
     # this runs in @parallel for fabric
     lpath = Path(local_dest_path)
     if lpath.exists():
-        rootLogger.debug(f"Overwriting {lpath.resolve(strict=False)}")
+        logging.debug(f"Overwriting {lpath.resolve(strict=False)}")
     fs, rpath = url_to_fs(uri)
 
     assert tries > 0, "tries argument must be larger than 0"
     for attempt in range(tries):
-        rootLogger.debug(
-            f"Download attempt {attempt+1} of {tries}: '{uri}' to '{lpath}'"
-        )
+        logging.debug(f"Download attempt {attempt+1} of {tries}: '{uri}' to '{lpath}'")
         try:
             fs.get_file(
                 rpath, fspath(lpath)
@@ -64,5 +58,5 @@ def downloadURI(uri: str, local_dest_path: str, tries: int = 4) -> None:
                 continue
             else:
                 raise  # tries have been exhausted, raise the last exception
-        rootLogger.debug(f"Successfully fetched '{uri}' to '{lpath}'")
+        logging.debug(f"Successfully fetched '{uri}' to '{lpath}'")
         break

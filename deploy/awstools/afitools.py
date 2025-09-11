@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import logging
+from absl import logging
 import boto3
 from awstools.awstools import depaginated_boto_query
-
-rootLogger = logging.getLogger()
 
 
 def get_fpga_regions():
@@ -32,8 +30,8 @@ def get_afi_for_agfi(agfi_id, region=None):
     region = None means use default region
     (AFIs are region specific, AGFIs are global).
     """
-    rootLogger.debug(agfi_id)
-    rootLogger.debug(region)
+    logging.debug(agfi_id)
+    logging.debug(region)
     region = region if region is not None else get_current_region()
 
     client = boto3.client("ec2", region_name=region)
@@ -45,7 +43,7 @@ def get_afi_for_agfi(agfi_id, region=None):
     fpga_images_all = depaginated_boto_query(
         client, "describe_fpga_images", operation_params, "FpgaImages"
     )
-    rootLogger.debug(fpga_images_all)
+    logging.debug(fpga_images_all)
     return fpga_images_all[0]["FpgaImageId"]
 
 
@@ -55,7 +53,7 @@ def copy_afi_to_all_regions(afi_id, starting_region=None):
     starting_region = (
         starting_region if starting_region is not None else get_current_region()
     )
-    rootLogger.info("""Copy starting region is: {}""".format(starting_region))
+    logging.info("""Copy starting region is: {}""".format(starting_region))
 
     # list of regions to make the agfi available in
     # (make a copy)
@@ -64,23 +62,23 @@ def copy_afi_to_all_regions(afi_id, starting_region=None):
     # remove the starting region, otherwise aws will create duplicate afis
     copy_to_regions.remove(starting_region)
 
-    rootLogger.info("""Regions to copy to: {}""".format(copy_to_regions))
-    rootLogger.info("""Copying AFI: {}""".format(afi_id))
+    logging.info("""Regions to copy to: {}""".format(copy_to_regions))
+    logging.info("""Copying AFI: {}""".format(afi_id))
 
     for region in copy_to_regions:
         client = boto3.client("ec2", region_name=region)
         result = client.copy_fpga_image(
             DryRun=False, SourceFpgaImageId=afi_id, SourceRegion=starting_region
         )
-        rootLogger.debug(result)
-        rootLogger.info("Copy result: " + str(result["FpgaImageId"]))
+        logging.debug(result)
+        logging.info("Copy result: " + str(result["FpgaImageId"]))
 
 
 def share_afi_with_users(afi_id, region, useridlist):
     """share the AFI in Region region with users in userlist."""
     client = boto3.client("ec2", region_name=region)
     if "public" in useridlist:
-        rootLogger.info("Sharing AGFI publicly.")
+        logging.info("Sharing AGFI publicly.")
         result = client.modify_fpga_image_attribute(
             FpgaImageId=afi_id,
             Attribute="loadPermission",
@@ -88,14 +86,14 @@ def share_afi_with_users(afi_id, region, useridlist):
             UserGroups=["all"],
         )
     else:
-        rootLogger.info("Sharing AGFI with selected users.")
+        logging.info("Sharing AGFI with selected users.")
         result = client.modify_fpga_image_attribute(
             FpgaImageId=afi_id,
             Attribute="loadPermission",
             OperationType="add",
             UserIds=list(map(str, useridlist)),
         )
-    rootLogger.debug(result)
+    logging.debug(result)
 
 
 def get_afi_sharing_ids_from_conf(conf):

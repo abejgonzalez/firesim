@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-import logging
+from absl import logging
 import abc
 from fabric.api import prefix, local, run, env, cd, warn_only, put, settings, hide  # type: ignore
 from fabric.contrib.project import rsync_project  # type: ignore
@@ -21,8 +21,6 @@ from typing import List, Dict, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from runtools.run_farm import RunHost
     from awstools.awstools import MockBoto3Instance
-
-rootLogger = logging.getLogger()
 
 
 class InstanceDeployManager(metaclass=abc.ABCMeta):
@@ -80,9 +78,9 @@ class InstanceDeployManager(metaclass=abc.ABCMeta):
     def instance_logger(self, logstr: str, debug: bool = False) -> None:
         """Log with this host's info as prefix."""
         if debug:
-            rootLogger.debug("""[{}] """.format(env.host_string) + logstr)
+            logging.debug("""[{}] """.format(env.host_string) + logstr)
         else:
-            rootLogger.info("""[{}] """.format(env.host_string) + logstr)
+            logging.info("""[{}] """.format(env.host_string) + logstr)
 
     def sim_node_qcow(self) -> None:
         """If NBD is available and qcow2 support is required, install qemu-img
@@ -182,8 +180,8 @@ class InstanceDeployManager(metaclass=abc.ABCMeta):
                     extra_opts="-L",
                     capture=True,
                 )
-                rootLogger.debug(rsync_cap)
-                rootLogger.debug(rsync_cap.stderr)
+                logging.debug(rsync_cap)
+                logging.debug(rsync_cap.stderr)
 
             run(f"cp -r {remote_sim_rsync_dir}/* {remote_sim_dir}/", shell=True)
 
@@ -287,7 +285,7 @@ class InstanceDeployManager(metaclass=abc.ABCMeta):
                 self.parent_node.sim_slots
             ), f"{slotno} can not index into sim_slots {len(self.parent_node.sim_slots)} on {self.parent_node.host}"
             server = self.parent_node.sim_slots[slotno]
-            rootLogger.info(
+            logging.info(
                 f"start_sim_slot slotno: {slotno} server_id {server.server_id_internal} remote_sim_dir {remote_sim_dir} {remote_home_dir}"
             )
 
@@ -385,7 +383,7 @@ class InstanceDeployManager(metaclass=abc.ABCMeta):
         """Boot up all the sims on this host in screens."""
         if self.instance_assigned_simulations():
             # only on sim nodes
-            rootLogger.info(
+            logging.info(
                 f"start_simulations_instance {len(self.parent_node.sim_slots)}"
             )
             for slotno in range(len(self.parent_node.sim_slots)):

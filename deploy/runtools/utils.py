@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 import lddwrap
-import logging
+from absl import logging
 from os import fspath
 from os.path import realpath
 from pathlib import Path
@@ -16,8 +16,6 @@ from awstools.awstools import get_localhost_instance_id
 from buildtools.utils import get_deploy_dir
 
 from typing import List, Tuple, Type, Optional
-
-rootLogger = logging.getLogger()
 
 
 def has_sudo() -> bool:
@@ -47,7 +45,7 @@ def get_local_shared_libraries(elf: str) -> List[Tuple[str, str]]:
     os_flavor = local(
         "grep '^ID=' /etc/os-release | awk -F= '{print $2}' | tr -d '\"'", capture=True
     )
-    rootLogger.debug(f"Running on OS: {os_flavor}")
+    logging.debug(f"Running on OS: {os_flavor}")
 
     if os_flavor not in ["ubuntu", "centos", "amzn", "debian", "rhel"]:
         raise ValueError(f"Unknown OS: {os_flavor}")
@@ -64,7 +62,7 @@ def get_local_shared_libraries(elf: str) -> List[Tuple[str, str]]:
             lines = dpkg_output.split("\n")
             pkgs = [":".join(l.split(":")[:1]) for l in lines]
 
-        rootLogger.debug(pkgs)
+        logging.debug(pkgs)
 
         for pkg in pkgs:
             dpkg_output_paths = local(
@@ -73,7 +71,7 @@ def get_local_shared_libraries(elf: str) -> List[Tuple[str, str]]:
             lines = dpkg_output.split("\n")
             glibc_shared_libs.extend(dpkg_output_paths.stdout.split("\n"))
 
-        rootLogger.debug(glibc_shared_libs)
+        logging.debug(glibc_shared_libs)
     elif os_flavor in ["centos", "amzn", "rhel"]:
         with settings(warn_only=True):
             rpm_output = local(
@@ -84,7 +82,7 @@ def get_local_shared_libraries(elf: str) -> List[Tuple[str, str]]:
             glibc_shared_libs.extend(rpm_output.split("\n"))
 
     libs = []
-    rootLogger.debug(f"Identifying ldd dependencies for: {elf}")
+    logging.debug(f"Identifying ldd dependencies for: {elf}")
     for dso in lddwrap.list_dependencies(Path(elf)):
         if dso.soname is None:
             assert dso.path is not None and "/ld-linux" in fspath(
@@ -97,10 +95,10 @@ def get_local_shared_libraries(elf: str) -> List[Tuple[str, str]]:
             dso.path is not None
         ), f"{dso.soname} has no linkage reported by ldd for {elf} in: {dso}"
         if fspath(dso.path) in glibc_shared_libs:
-            rootLogger.debug(f"{dso.path} found in glibc_shared_libs. skipping")
+            logging.debug(f"{dso.path} found in glibc_shared_libs. skipping")
             continue
         if fspath(realpath(dso.path)) in glibc_shared_libs:
-            rootLogger.debug(
+            logging.debug(
                 f"{dso.path} realpath {realpath(dso.path)} found in glibc_shared_libs. skipping"
             )
             continue
@@ -110,7 +108,7 @@ def get_local_shared_libraries(elf: str) -> List[Tuple[str, str]]:
         # so that we have fewer pieces to copy over
         libs.append((realpath(dso.path), dso.soname))
 
-    rootLogger.debug(libs)
+    logging.debug(libs)
 
     return libs
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import random
 import string
-import logging
+from absl import logging
 from fabric.api import local  # type: ignore
 
 from runtools.utils import is_on_aws
@@ -14,8 +14,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from runtools.topology.elements import FireSimSwitchNode
-
-rootLogger = logging.getLogger()
 
 
 class AbstractSwitchToSwitchConfig:
@@ -190,17 +188,17 @@ class AbstractSwitchToSwitchConfig:
             switchorigdir + binaryname + "-" + self.build_disambiguate + "-build/"
         )
 
-        rootLogger.info(
+        logging.info(
             "Building switch model binary for switch " + str(self.switch_binary_name())
         )
 
-        rootLogger.debug(str(configfile))
+        logging.debug(str(configfile))
 
         def local_logged(command: str) -> None:
             """Run local command with logging."""
             localcap = local(command, capture=True)
-            rootLogger.debug(localcap)
-            rootLogger.debug(localcap.stderr)
+            logging.debug(localcap)
+            logging.debug(localcap.stderr)
 
         # make a build dir for this switch
         local_logged("mkdir -p " + switchbuilddir)

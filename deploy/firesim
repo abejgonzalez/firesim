@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
-# PYTHON_ARGCOMPLETE_OK
+
 from __future__ import annotations
 
 import sys
 import os
 import signal
-import argparse
 from time import strftime, gmtime
-import logging
 import random
-import argcomplete # type: ignore
 from absl import app, flags
-from absl.flags import argparse_flags
+import absl.logging
+import logging
 
 from datetime import date
 import warnings
@@ -43,7 +41,6 @@ from typing import Dict, Callable, Optional, TypedDict, get_type_hints, Tuple, L
 FLAGS = flags.FLAGS
 PLATFORM_LIST = [_.name for _ in Path(__file__).parent.parent.joinpath('platforms').iterdir()]
 flags.DEFINE_enum('platform', 'f1', PLATFORM_LIST, 'Required argument for "managerinit" to specify which platform you will be using')
-flags.DEFINE_string('task', None, 'Management task to run (overridden by argparse).')
 
 class Task(TypedDict):
     task: Callable
@@ -100,6 +97,7 @@ def register_task(task: Callable) -> Callable:
     # are convoluted
     return inner
 
+
 ## below are tasks that users can call
 ## to add a task, add it here, using the @register_task decorator in it's definition
 
@@ -109,23 +107,23 @@ def managerinit():
     """ Setup local FireSim manager components. """
 
     if not flags.FLAGS.platform:
-        rootLogger.error('::ERROR:: managerinit requires that you provide --platform <platformname>')
+        absl.logging.error('::ERROR:: managerinit requires that you provide --platform <platformname>')
         sys.exit(1)
 
-    rootLogger.info("Backing up initial config files, if they exist.")
+    absl.logging.info("Backing up initial config files, if they exist.")
     config_files = ["build", "build_recipes", "hwdb", "runtime"]
     for conf_file in config_files:
         with warn_only(), hide('everything'):
             m = local(f"cp config_{conf_file}.yaml sample-backup-configs/backup_config_{conf_file}.yaml", capture=True)
-            rootLogger.debug(m)
-            rootLogger.debug(m.stderr)
+            absl.logging.debug(m)
+            absl.logging.debug(m.stderr)
 
-    rootLogger.info("Creating initial config files from examples.")
+    absl.logging.info("Creating initial config files from examples.")
     with hide('everything'):
         for conf_file in config_files:
             m = local(f"cp sample-backup-configs/sample_config_{conf_file}.yaml config_{conf_file}.yaml", capture=True)
-            rootLogger.debug(m)
-            rootLogger.debug(m.stderr)
+            absl.logging.debug(m)
+            absl.logging.debug(m.stderr)
 
     def get_indexes(lines: List[str], keyword_start: str, keyword_end: str)-> Tuple[int, int]:
         start_arg_idx = None
@@ -141,7 +139,7 @@ def managerinit():
 
         return start_arg_idx, end_arg_idx
 
-    rootLogger.info("Adding default overrides to config files")
+    absl.logging.info("Adding default overrides to config files")
     if flags.FLAGS.platform == 'f1':
         runfarm_default_file = "run-farm-recipes/aws_ec2.yaml"
         with open(runfarm_default_file, "r") as f:
@@ -221,7 +219,7 @@ def managerinit():
             "managerinit replace end",
             bf_recipe_lines)
     else:
-        rootLogger.info(f"Unknown platform {flags.FLAGS.platform}. Skipping default config overrides.")
+        absl.logging.info(f"Unknown platform {flags.FLAGS.platform}. Skipping default config overrides.")
 
     if flags.FLAGS.platform == 'f1':
         awsinit()
@@ -259,7 +257,7 @@ def buildbitstream(build_config_file: BuildConfigFile) -> None:
 
     def release_build_hosts_handler(sig, frame) -> None:
         """ Handler that prompts to release build farm hosts if you press ctrl-c. """
-        rootLogger.info("You pressed ctrl-c, so builds have been killed.")
+        absl.logging.info("You pressed ctrl-c, so builds have been killed.")
 
         userconfirm = "yes"
         if not build_config_file.forceterminate:
@@ -267,9 +265,9 @@ def buildbitstream(build_config_file: BuildConfigFile) -> None:
 
         if userconfirm == "yes":
             build_config_file.release_build_hosts()
-            rootLogger.info("Build farm hosts released.")
+            absl.logging.info("Build farm hosts released.")
         else:
-            rootLogger.info("Build farm release skipped. There may still be build farm hosts running.")
+            absl.logging.info("Build farm release skipped. There may still be build farm hosts running.")
         sys.exit(0)
 
     signal.signal(signal.SIGINT, release_build_hosts_handler)
@@ -299,7 +297,7 @@ def buildbitstream(build_config_file: BuildConfigFile) -> None:
     # run builds, then terminate instances
     results = execute(parallel_build_helper, build_config_file, hosts=build_config_file.build_ip_set)
     if False in results.values():
-        rootLogger.critical("ERROR: A bitstream build failed.")
+        absl.logging.fatal("ERROR: A bitstream build failed.")
         sys.exit(1)
 
 @register_task
@@ -376,18 +374,12 @@ def shareagfi(build_config_file: BuildConfigFile) -> None:
 
         userlist = build_config_file.acctids_to_sharewith
         share_agfi_in_all_regions(agfi, userlist)
-        rootLogger.info("AGFI '%s': %s has been shared with the users specified in share-with-accounts",
+        absl.logging.info("AGFI '%s': %s has been shared with the users specified in share-with-accounts",
                         agfiname, agfi)
 
 
-def construct_firesim_argparser() -> argparse_flags.ArgumentParser:
-    # parse command line args
-    parser = argparse_flags.ArgumentParser(description='FireSim Simulation Manager.')
-    parser.add_argument('task', type=str,
-                        help='Management task to run.', choices=list(TASKS))
+flags.DEFINE_enum('task', None, list(TASKS), 'Management task to run.')
 
-    argcomplete.autocomplete(parser)
-    return parser
 
 def check_env() -> None:
     """Check assumptions about environment setup
@@ -397,12 +389,11 @@ def check_env() -> None:
     """
     # make sure that sourceme-f1 was sourced
     if os.environ.get('FIRESIM_SOURCED') is None:
-        rootLogger.critical("ERROR: You must source firesim/sourceme-manager.sh!")
+        absl.logging.fatal("ERROR: You must source firesim/sourceme-manager.sh!")
         sys.exit(1)
 
 
-def main(args) -> None:
-    """ Main function for FireSim manager. """
+def setup_fabric() -> None:
     # large timeouts, retry connections
     env.timeout = 100
     env.connection_attempts = 10
@@ -410,59 +401,45 @@ def main(args) -> None:
     # different keys. also, probably won't get MITM'd
     env.disable_known_hosts = True
 
-    rootLogger.info("FireSim Manager. Docs: https://docs.fires.im\nRunning: %s\n", str(args.task))
 
-    t = TASKS[args.task]
-    if t['config']:
-        if t['config'] is argparse.Namespace:
-            t['task']()
-        else:
-            t['task'](t['config']())
-    else:
-        t['task']()
+def try_override_task(argv) -> None:
+    if len(argv) > 2:
+        print("Invalid number of arguments. Either use a positional argument for a task (i.e., 'firesim TASK') or use the dash flag (i.e., 'firesim --task TASK').")
+        sys.exit(1)
+    elif len(argv) == 2:
+        FLAGS.task = argv[1]
 
 
-if __name__ == '__main__':
+def main(argv) -> None:
+    """ Main function for FireSim manager. """
     # set the program working dir to wherever firesim is located
     # this lets you run firesim from anywhere, not necessarily firesim/deploy/
     abspath = os.path.abspath(__file__)
     dname = os.path.dirname(abspath)
     os.chdir(dname)
 
-    # parse args BEFORE setting up logs, otherwise argcomplete will cause
-    # junk log files to be created. also lets us use args.task in the logfile
-    # name
-    args = construct_firesim_argparser().parse_args()
-    FLAGS.task = args.task # override the absl flag for task from the argparse one
+    try_override_task(argv) # must be before logging setup to potentially override FLAGS.task
 
-    # logging setup
+    # setup logging
     def logfilename() -> str:
         """ Construct a unique log file name from: date + 16 char random. """
         timeline = strftime("%Y-%m-%d--%H-%M-%S", gmtime())
         randname = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-        return timeline + "-" + args.task + "-" + randname + ".log"
+        return timeline + "-" + FLAGS.task + "-" + randname + ".log"
 
-    # treat python warnings as WARNING level messages from py.warn
-    logging.captureWarnings(True)
+    logFormatter = logging.Formatter("%(asctime)s [%(funcName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 
-    rootLogger = logging.getLogger()
-    rootLogger.setLevel(logging.NOTSET) # capture everything
+    absl_handler = absl.logging.get_absl_handler()
+    absl_handler.setFormatter(logFormatter)
+    absl_handler.setLevel(logging.INFO) # print only INFO (for std*)
 
     # log to file
-    full_log_filename = "logs/" + logfilename()
+    full_log_filename = f"""logs/{logfilename()}"""
     fileHandler = logging.FileHandler(full_log_filename)
-    # formatting for log to file
-    # TODO: filehandler should be handler 0 (firesim_topology_with_passes expects this
-    # to get the filename) - handle this more appropriately later
-    logFormatter = logging.Formatter("%(asctime)s [%(funcName)-12.12s] [%(levelname)-5.5s]  %(message)s")
     fileHandler.setFormatter(logFormatter)
-    fileHandler.setLevel(logging.NOTSET) # log everything to file
-    rootLogger.addHandler(fileHandler)
-
-    # log to stdout, without special formatting
-    consoleHandler = logging.StreamHandler(stream=sys.stdout)
-    consoleHandler.setLevel(logging.INFO) # show only INFO and greater in console
-    rootLogger.addHandler(consoleHandler)
+    fileHandler.setLevel(logging.NOTSET) # print everything (to file)
+    logging.getLogger().addHandler(fileHandler) # add handler to root logger
+    logging.getLogger().setLevel(logging.NOTSET) # print everything (for std*)
 
     # hide messages lower than warning from boto3/paramiko
     logging.getLogger('boto3').setLevel(logging.WARNING)
@@ -470,20 +447,32 @@ if __name__ == '__main__':
     logging.getLogger('nose').setLevel(logging.WARNING)
     logging.getLogger("paramiko").setLevel(logging.WARNING)
 
-    check_env()
+    # treat python warnings as WARNING level messages from py.warn
+    logging.captureWarnings(True)
 
-    # lastly - we want anything printed to stdout to be converted into a DEBUG
+    # we want anything printed to stdout to be converted into a DEBUG
     # level logging message and anything printed to stderr converted into INFO.
     # This is primarily because fabric does not use logging, it prints explicitly
     # to stdout and stderr.  We want it's output to be logged.
     with StreamLogger('stdout'), InfoStreamLogger('stderr'):
         exitcode = 0
         try:
-            main(args)
+            check_env()
+            setup_fabric()
+            absl.logging.info("FireSim Manager. Docs: https://docs.fires.im")
+            absl.logging.info("Running: %s\n", str(FLAGS.task))
+            t = TASKS[FLAGS.task]
+            if t['config']:
+                t['task'](t['config']())
+            else:
+                t['task']()
         except:
             # log all exceptions that make it this far
-            rootLogger.exception("Fatal error.")
+            absl.logging.exception("Fatal error.")
             exitcode = 1
         finally:
-            rootLogger.info(f"""The full log of this run is:\n{dname}/{full_log_filename}""" )
+            absl.logging.info(f"""The full log of this run is:\n{dname}/{full_log_filename}""" )
             sys.exit(exitcode)
+
+if __name__ == '__main__':
+    app.run(main)

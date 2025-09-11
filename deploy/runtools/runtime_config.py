@@ -3,7 +3,7 @@ simulation tasks. """
 
 from __future__ import annotations
 
-import logging
+from absl import logging
 from absl import flags
 from time import strftime, gmtime
 
@@ -16,7 +16,6 @@ from runtools.workload import WorkloadConfig
 from runtools.topology.core_with_passes import FireSimTopologyWithPasses
 from runtools.runtime_build_recipes import RuntimeBuildRecipes
 
-rootLogger = logging.getLogger()
 
 FLAGS = flags.FLAGS
 
@@ -86,10 +85,10 @@ class RuntimeConfig:
         # construct pythonic db of hardware configurations available to us at
         # runtime.
         self.runtimehwdb = RuntimeHWDB(FLAGS.hwdbconfigfile)
-        rootLogger.debug(self.runtimehwdb)
+        logging.debug(self.runtimehwdb)
 
         self.innerconf = InnerRuntimeConfiguration()
-        rootLogger.debug(self.innerconf)
+        logging.debug(self.innerconf)
 
         self.runtime_build_recipes = RuntimeBuildRecipes(
             FLAGS.buildrecipesconfigfile,
@@ -97,7 +96,7 @@ class RuntimeConfig:
             self.innerconf.metasimulation_only_plusargs,
             self.innerconf.metasimulation_only_vcs_plusargs,
         )
-        rootLogger.debug(self.runtime_build_recipes)
+        logging.debug(self.runtime_build_recipes)
 
         self.run_farm = self.innerconf.run_farm_dispatcher
 

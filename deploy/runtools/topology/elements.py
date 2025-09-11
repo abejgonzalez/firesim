@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import logging
+from absl import logging
 import abc
 import sys
 from fabric.contrib.project import rsync_project  # type: ignore
@@ -34,8 +34,6 @@ if TYPE_CHECKING:
     from runtools.runtime_hw_config import RuntimeHWConfig
     from runtools.utils import MacAddress
     from runtools.instance_deploy_managers.ec2 import EC2InstanceDeployManager
-
-rootLogger = logging.getLogger()
 
 
 class FireSimLink:
@@ -257,7 +255,7 @@ class FireSimServerNode(FireSimNode):
     def set_server_hardware_config(
         self, server_hardware_config: RuntimeHWConfig
     ) -> None:
-        rootLogger.info(
+        logging.info(
             f"set_server_hardware_config {self.server_id_internal} {self.server_hardware_config}"
         )
         self.server_hardware_config = server_hardware_config
@@ -342,12 +340,12 @@ class FireSimServerNode(FireSimNode):
             shmemportname = self.uplinks[0].get_global_link_id()
 
             for ul in self.uplinks:
-                rootLogger.info(f"ul {ul}, ul.uplink_size {ul.uplink_side}")
+                logging.info(f"ul {ul}, ul.uplink_size {ul.uplink_side}")
                 uplink_node = ul.uplink_side
                 if isinstance(uplink_node, FireSimPipeNode):
                     uplink_node.pipe_builder.collect_partition_boundary_params()
                     cutbridge_idxs.append(uplink_node.get_cutbridge_global_idx(self))
-            rootLogger.info(
+            logging.info(
                 f"self {self} id_internal {self.server_id_internal}  {cutbridge_idxs} slotno {slotno}"
             )
 
@@ -393,7 +391,7 @@ class FireSimServerNode(FireSimNode):
             )
         )
 
-        rootLogger.debug(f"runcommand {runcommand}")
+        logging.debug(f"runcommand {runcommand}")
 
         return runcommand
 
@@ -424,8 +422,8 @@ class FireSimServerNode(FireSimNode):
         """Mkdir local job results directory and write any pre-sim metadata."""
         job_dir = self.get_local_job_results_dir_path()
         localcap = local("""mkdir -p {}""".format(job_dir), capture=True)
-        rootLogger.debug("[localhost] " + str(localcap))
-        rootLogger.debug("[localhost] " + str(localcap.stderr))
+        logging.debug("[localhost] " + str(localcap))
+        logging.debug("[localhost] " + str(localcap.stderr))
 
         # add hw config summary per job
         localcap = local(
@@ -434,8 +432,8 @@ class FireSimServerNode(FireSimNode):
             ),
             capture=True,
         )
-        rootLogger.debug("[localhost] " + str(localcap))
-        rootLogger.debug("[localhost] " + str(localcap.stderr))
+        logging.debug("[localhost] " + str(localcap))
+        logging.debug("[localhost] " + str(localcap.stderr))
 
     def write_script(self, script_name, command) -> str:
         """Write a script named script_name to the local job results dir with
@@ -539,8 +537,8 @@ class FireSimServerNode(FireSimNode):
                         upload=False,
                         capture=True,
                     )
-                    rootLogger.debug(rsync_cap)
-                    rootLogger.debug(rsync_cap.stderr)
+                    logging.debug(rsync_cap)
+                    logging.debug(rsync_cap.stderr)
 
             ## unmount
             umount(mountpoint, dest_sim_slot_dir)
@@ -562,8 +560,8 @@ class FireSimServerNode(FireSimNode):
                     upload=False,
                     capture=True,
                 )
-                rootLogger.debug(rsync_cap)
-                rootLogger.debug(rsync_cap.stderr)
+                logging.debug(rsync_cap)
+                logging.debug(rsync_cap.stderr)
 
     def get_sim_kill_command(self, slotno: int) -> str:
         """return the command to kill the simulation. assumes it will be
@@ -960,8 +958,8 @@ class FireSimSwitchNode(FireSimNode):
         job_dir = """{}/switch{}/""".format(job_results_dir, self.switch_id_internal)
 
         localcap = local("""mkdir -p {}""".format(job_dir), capture=True)
-        rootLogger.debug("[localhost] " + str(localcap))
-        rootLogger.debug("[localhost] " + str(localcap.stderr))
+        logging.debug("[localhost] " + str(localcap))
+        logging.debug("[localhost] " + str(localcap.stderr))
 
         dest_sim_dir = self.get_host_instance().get_sim_dir()
 
@@ -1033,8 +1031,8 @@ class FireSimPipeNode(FireSimNode):
         job_dir = """{}/pipe{}/""".format(job_results_dir, self.pipe_id_internal)
 
         localcap = local("""mkdir -p {}""".format(job_dir), capture=True)
-        rootLogger.debug("[localhost] " + str(localcap))
-        rootLogger.debug("[localhost] " + str(localcap.stderr))
+        logging.debug("[localhost] " + str(localcap))
+        logging.debug("[localhost] " + str(localcap.stderr))
 
         dest_sim_dir = self.get_host_instance().get_sim_dir()
 
